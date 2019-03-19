@@ -10,20 +10,41 @@ Meteor.methods({
 
 		if (!Meteor.userId()) {
 			throw new Meteor.Error('error-invalid-user', 'Invalid user', {
-				method: 'eraseRoom',
+				method: 'unmatchRoom',
 			});
 		}
-		// const teachingMatchesCount = TandemUserMatches.findAsTeacher(Meteor.userId().count());
-		// if (!teachingMatchesCount === 0) {
-		// 	Roles.removeUserRoles(Meteor.userId(), ['tandem-teacher']);
-		// }
-        //
-		// const learningMatchesCount = TandemUserMatches.findAsStudent(Meteor.userId().count());
-		// if (!learningMatchesCount === 0){
-		// 	Roles.removeUserRoles(Meteor.userId(), ['tandem-student']);
-		// }
-        //
-		// return TandemUserMatches.removeById(match._id);
+
+		const match = TandemUserMatches.findByUserIdAndRoomId(Meteor.userId(), rid);
+
+		if (!match){
+			throw new Meteor.Error('error-invalid-user', 'Invalid user', {
+				method: 'unmatchRoom',
+			});
+		}
+
+		TandemUserMatches.unmatchMatch(match._id, true);
+
+		const optionsS = {
+			unmatched : false,
+			studentId : Meteor.userId(),
+		};
+		const matchesAsStudent = TandemUserMatches.findWithOptions(optionsS);
+
+		const optionsT = {
+			unmatched : false,
+			teacherId : Meteor.userId(),
+		};
+
+		const matchesAsTeacher = TandemUserMatches.findWithOptions(optionsT);
+
+		if (!matchesAsStudent.count() === 0){
+			Roles.removeUserRoles(Meteor.userId(), ['tandem-student']);
+		}
+
+		if (!matchesAsTeacher.count() === 0) {
+			Roles.removeUserRoles(Meteor.userId(), ['tandem-teacher']);
+		}
+
 		return true;
 	},
 });

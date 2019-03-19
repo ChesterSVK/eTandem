@@ -10,6 +10,9 @@ export class TandemUserLanguages extends Base {
 		return this.find({motivation: motivation});
 	}
 
+	findAll() {
+		return this.find({});
+	}
 }
 
 export default new TandemUserLanguages();

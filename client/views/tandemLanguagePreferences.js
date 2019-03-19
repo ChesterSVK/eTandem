@@ -1,13 +1,9 @@
-import {Meteor} from 'meteor/meteor';
-import {Template} from 'meteor/templating';
-import {settings} from 'meteor/rocketchat:settings';
-import './tandemLanguagePreferences.html';
-// import TandemHeader from '../components/react/TandemHeader';
 import TandemPreferences from '../components/react/Preferences/TandemPreferences';
 import TandemLanguages from '../models/TandemLanguages'
 import TandemLanguageLevels from '../models/TandemLanguageLevels'
 import TandemUserLanguages from '../models/TandemUserLanguages'
 import { TeachingMotivationEnum  } from '../../lib/teachingMotivation'
+import { t } from 'meteor/rocketchat:utils';
 import s from "underscore.string";
 
 
@@ -28,11 +24,11 @@ Template.tandemLanguagePreferences.onCreated(function () {
 
 		// if subscription is ready, init structures
 		if (subscriptionLanguages.ready()) {
-			instance.languages.set(TandemLanguages.find({}));
+			instance.languages.set(TandemLanguages.find({}).fetch());
 		}
 		// if subscription is ready, init structures
 		if (subscriptionLevels.ready()) {
-			instance.languageLevels.set(TandemLanguageLevels.find({}));
+			instance.languageLevels.set(TandemLanguageLevels.find({}).fetch());
 		}
 
 		// if subscription is ready, init structures
@@ -50,7 +46,9 @@ Template.tandemLanguagePreferences.rendered = function () {
 };
 
 Template.tandemLanguagePreferences.helpers({
-
+	title(){
+		return t("Preferences");
+	},
 	getLearningPreferences(){
 		return Template.instance().learningLanguages.get();
 	},

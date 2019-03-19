@@ -1,3 +1,4 @@
+
 #Tandem Integration
 
 ## DATA:
@@ -87,6 +88,9 @@ meteor npm start
 >###Accounts:
 >>####Default Directory Listing:
 >>> #####Users
+>>####Default User Preferences:
+>>> #####Group By Type:
+>>>> ######False
 
 >###General:
 >>####Enable Favourite Rooms:
@@ -97,46 +101,66 @@ meteor npm start
 >>>#####Group Channels by type:
 >>>> ######False
 >>>#####Click to create direct message:
->>>> ######True
+>>>> ######False
+>>####Colors:
+>>>>#####Primary:
+>>>>>###### #ffffff
 >>####Custom CSS:
 >>>>
 ```
-    .sidebar__header{
-    	display: block;
-    }
-    .sidebar__toolbar{
-      display: block; width: 100%; margin: 0; text-align: center;
-    }
-    .sidebar__header-thumb{
-      display:block; margin: 1em auto; height: 140px; width: 140px;
-    }
-    .sidebar__header-status-bullet{
-    	width: 152px;
-        height: 152px;
-        bottom: -6px;
-        right: -6px;
-        border-radius: 0;
-        position: absolute;
-        z-index: -1;
-    }
-    .sidebar__footer{
-      text-align: center;
-    }
-    .rc-header__block{
-      margin: 0;
-    }
-    .rc-old .page-container .content {
-    	display: block;
-    }
-    @media only screen and (max-width: 500px) {
-     	.sidebar__header-thumb{
-      		height: 100px; width: 100px;
-    	}
-    	.sidebar__header-status-bullet{
-        	width: 112px;
-           	height: 112px;
-        }
-    }
+   .sidebar__header{
+      	display: block;
+      }
+      .sidebar__toolbar{
+        display: block; width: 100%; margin: 0; text-align: center;
+      }
+      .sidebar__header-thumb{
+        display:block; margin: 1em auto; height: 140px; width: 140px;
+      }
+      .sidebar__header-status-bullet{
+      	width: 152px;
+          height: 152px;
+          bottom: -6px;
+          right: -6px;
+          border-radius: 0;
+          position: absolute;
+          z-index: -1;
+        	border: 0;
+      }
+      .sidebar__footer{
+        text-align: center;
+        height : 63px !important;
+        background-color: #3f51b5;
+        box-shadow: 0px 2px 4px -1px rgba(0,0,0,0.2), 0px 4px 5px 0px rgba(0,0,0,0.14), 0px 1px 10px 0px rgba(0,0,0,0.12);
+      }
+      .rc-header__block{
+        margin: 0;
+      }
+      .rc-old .page-container .content {
+      	display: block;
+      }
+  	.sidebar{
+  	
+        	box-shadow: 
+            0px 2px 4px -1px rgba(0,0,0,0.2), 
+            0px 4px 5px 0px rgba(0,0,0,0.14), 
+            0px 1px 10px 0px rgba(0,0,0,0.12);
+      
+        	background-color: #fff;
+  	   
+  	}
+  
+  
+  	
+      @media only screen and (max-width: 500px) {
+       	.sidebar__header-thumb{
+        		height: 100px; width: 100px;
+      	}
+      	.sidebar__header-status-bullet{
+          	width: 112px;
+             	height: 112px;
+          }
+      }
 ```
 
 >###Logs
@@ -151,6 +175,10 @@ meteor npm start
 
 >###Messages
 >>####Messages to yourself:
+>>> #####false
+>>####Hex preview:
+>>> #####false
+>>####Autolinker:
 >>> #####false
 >>####Katex - Enabled: 
 >>> #####false
@@ -213,9 +241,7 @@ FlowRouter.route('/languageMatches', {
 
 	action(params, queryParams) {
 		Meteor.call('tandemUserLanguages/hasSomePreferences', (error, result) => {
-			if (!result
-				// || !(getUserPreference(Meteor.user()._id, 'tandemSkipPreferencesCondition', false))
-			){
+			if (!result){
 				FlowRouter.go('/languagePreferences');
 			}
 			else {
@@ -357,7 +383,7 @@ import { hide, leave, unmatch } from './ChannelActions';
 >>`packages/rocketchat-ui-utils/client/lib/ChannelActions.js`
 ```
 ...
-//Tandem
+// Tandem
 export async function unmatch(type, rid, name) {
 	modal.open({
 		title: t('Are_you_sure'),
@@ -411,6 +437,75 @@ export async function unmatch(type, rid, name) {
 >>>>*Method unmatch defined in `rocketchat-tandem/server/methods`
 
 
+>###Added reporting user with email to tandem admins
+
+>>`packages/rocketchat-ui-flextab/package.js`
+```
+```
+>>`packages/rocketchat-ui-flextab/client/tabs/userActions.js`
+```
+...
+// Tandem
+import {hasAllPermission, hasRole} from 'meteor/rocketchat:authorization';
+...
+
+		// Tandem
+    	const canReportUser = () => hasPermission('tandem-report-user', Session.get('openedRoom'));
+    	
+...
+//Add to action functions array 
+
+// Tandem
+		, () => {
+			if (!canReportUser()) {
+				return;
+			}
+			return {
+				group: 'channel',
+				icon: 'warning',
+				name: t('Report_user'),
+				action: prevent(getUser, ({username}) => {
+					const rid = Session.get('openedRoom');
+					const room = ChatRoom.findOne(rid);
+					if (!hasPermission('tandem-report-user')) {
+						return toastr.error(TAPi18n.__('error-not-allowed'));
+					}
+					modal.open({
+							title: t('Are_you_sure'),
+							text: t('Reason?'),
+							type: 'input',
+							inputType: 'text',
+							showCancelButton: true,
+							confirmButtonColor: '#DD6B55',
+							confirmButtonText: t('Yes_report_user'),
+							cancelButtonText: t('Cancel'),
+							closeOnConfirm: false,
+							html: false,
+						}, (reason) => {
+							Meteor.call('reportUserInRoom', {rid, username, reason}, success(() => {
+								modal.open({
+									title: t('Reported'),
+									text: t('User_has_been_reported'),
+									type: 'success',
+									timer: 2000,
+									showConfirmButton: false,
+								});
+							}))
+						},
+					);
+				}),
+			};
+		}
+
+```
+>>method defined in tandem-package/server/methods/reportUserInRoom.js
+
+>###Added translation files
+
+>>`packages/rocketchat-i18n/i18n/rokcetchat-tandem.en.i18n.json`
+
+
+
 #Tandem developer notes
 >##React with [react-template-helper](https://atmospherejs.com/meteor/react-template-helper)
 >Package `rocketchat-tandem` uses React combined with Blaze components which was decided solely for learning
@@ -438,5 +533,16 @@ component to some child react component seems to throw undefined error. Reason: 
 
 
 #Rocketchat developer suggestions
+
+
+>###Import bug
+>>RoomManager is in ui-utils
+>>`packages/rocketchat-ui-message/client/messageBoxAudioMessage`
+```
+import { AudioRecorder, chatMessages } from 'meteor/rocketchat:ui';
+import { RoomManager } from 'meteor/rocketchat:ui-utils';
+```
+>>Reported as an [issue 137445](https://github.com/RocketChat/Rocket.Chat/issues/13745)
+
 
  - permissions-manager .content - display block

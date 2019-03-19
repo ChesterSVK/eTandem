@@ -23,8 +23,9 @@ Meteor.startup(function() {
 	}
 
 	const tandemRoles = [
-		{ name: 'tandem-teacher', scope: 'Users',         description: 'Tandem teacher' },
-		{ name: 'tandem-student', scope: 'Users',         description: 'Tandem student' },
+		{ name: 'tandem-admin', 	scope: 'Users',         description: 'Tandem admin' },
+		{ name: 'tandem-teacher', 	scope: 'Users',         description: 'Tandem teacher' },
+		{ name: 'tandem-student', 	scope: 'Users',         description: 'Tandem student' },
 	];
 
 	for (const role of tandemRoles) {

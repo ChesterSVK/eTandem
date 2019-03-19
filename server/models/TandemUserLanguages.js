@@ -5,16 +5,19 @@ export class TandemUserLanguages extends Base {
 		super("tandem_user_languages");
 
 		this.model.before.insert((userId, doc) => {
-
 		});
 
 		this.tryEnsureIndex({
 			userId: 1,
-			langName: 1,
+			langId: 1,
 			motivation: 1,
 		}, {
 			unique: 1,
 		});
+	}
+
+	insertNew(userId, motivation, preference){
+		return this.insert({userId: userId, motivation : motivation, levelId: preference.levelId, langId: preference.langId, credits : preference.credits})
 	}
 
 
@@ -22,24 +25,20 @@ export class TandemUserLanguages extends Base {
 		return this.find({userId: userId});
 	}
 
-	// findByUserIdAndLangName(userId, langName) {
-	// 	return this.find({userId: userId, langName: langName});
-	// }
-    //
-	// findOneByUserIdLangNameAndMotivation(userId, langName, motivation) {
-	// 	return this.findOne({userId: userId, langName: langName, motivation: motivation});
-	// }
-
-	findTeachingLanguages(userId, langName, motivation) {
-		return this.findOne({userId: userId, langName: langName, motivation: motivation});
+	findTeachingLanguages(userId, langId, motivation) {
+		return this.findOne({userId: userId, langId: langId, motivation: motivation});
 	}
 
 	findUserLanguages(userId, motivation) {
 		return this.find({userId: userId, motivation: motivation});
 	}
 
-	findLanguageMatches(exceptUserId, motivation, langName) {
-		return this.find({userId: {$ne: exceptUserId}, motivation: motivation, langName: langName});
+	findLanguageMatches(exceptUserId, motivation, langId, levelIds) {
+		return this.find({userId: {$ne: exceptUserId}, motivation: motivation, langId: langId, levelId: { $in : levelIds }});
+	}
+
+	deleteUserPreferences(userId, motivation){
+		return this.remove({userId: userId, motivation : motivation});
 	}
 }
 

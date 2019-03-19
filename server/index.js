@@ -2,6 +2,8 @@ import './methods/tandemUserLanguages';
 import './methods/tandemUserMatches';
 import './methods/tandemUserLanguageMatches';
 import './methods/unmatchRoom';
+import './methods/hasUserStudents';
+import './methods/reportUserInRoom';
 
 import './publications/tandemLanguages';
 import './publications/tandemLanguageLevels';

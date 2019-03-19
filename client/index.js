@@ -1,10 +1,11 @@
-
+import './style.css'
 import './views/tandemLanguageMatches.html'
 import './views/tandemLanguageMatches.js'
 import './views/tandemLanguagePreferences.html'
 import './views/tandemLanguagePreferences'
 import './components/tandemSidebar.html'
 import './components/tandemSidebar'
+
 
 import TandemUsersMatches from './models/TandemUsersMatches';
 import TandemUserLanguages from './models/TandemUserLanguages';

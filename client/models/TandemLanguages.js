@@ -5,6 +5,14 @@ export class TandemLanguages extends Base {
 		super();
 		this._initModel('tandem_languages');
 	}
+
+	findById(langId) {
+		return this.findOne({_id: langId});
+	}
+
+	findAll() {
+		return this.find({});
+	}
 }
 
 export default new TandemLanguages();

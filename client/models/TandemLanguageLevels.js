@@ -5,6 +5,14 @@ export class TandemLanguageLevels extends Base {
 		super();
 		this._initModel('tandem_language_levels');
 	}
+
+	findById(levelId) {
+		return this.findOne({_id: levelId});
+	}
+
+	findAll() {
+		return this.find({});
+	}
 }
 
 export default new TandemLanguageLevels();

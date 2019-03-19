@@ -2,6 +2,7 @@ import { Meteor } from 'meteor/meteor';
 import { Template } from 'meteor/templating';
 import { settings } from 'meteor/rocketchat:settings';
 import TandemMatches from '../components/react/MatchMaking/TandemMatches'
+import { t } from 'meteor/rocketchat:utils';
 
 Template.tandemLanguageMatches.onCreated(function () {
 	// 1. Instance
@@ -22,6 +23,9 @@ Template.tandemLanguageMatches.onCreated(function () {
 ;
 
 Template.tandemLanguageMatches.helpers({
+	title(){
+		return t("Matches");
+	},
 	MatchMaking(){
 		return TandemMatches;
 	},

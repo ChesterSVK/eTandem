@@ -25,7 +25,7 @@ export class TandemLanguageLevels extends Base {
 	}
 
 	findAll() {
-		return this._db.find({});
+		return this.find({});
 	}
 }
 
