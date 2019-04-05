@@ -2,12 +2,12 @@ import { Meteor } from 'meteor/meteor';
 import { Template } from 'meteor/templating';
 import { settings } from 'meteor/rocketchat:settings';
 import TandemMatches from '../components/react/MatchMaking/TandemMatches'
-import { t } from 'meteor/rocketchat:utils';
+import { t, handleError } from 'meteor/rocketchat:utils';
 
 Template.tandemLanguageMatches.onCreated(function () {
 	// 1. Instance
 	const instance = this;
-	this.languageMatches = new ReactiveVar([]);
+	this.userMatches = new ReactiveVar([]);
 	// 2. Autorun
 	instance.autorun(function () {
 		Meteor.call('tandemUserLanguageMatches/get', function(error, results) {
@@ -15,7 +15,7 @@ Template.tandemLanguageMatches.onCreated(function () {
 				handleError(error);
 			}
 
-			instance.languageMatches.set(results);
+			instance.userMatches.set(results);
 			return results;
 		});
 	});
@@ -30,6 +30,6 @@ Template.tandemLanguageMatches.helpers({
 		return TandemMatches;
 	},
 	getLanguageMatches(){
-		return Template.instance().languageMatches.get();
+		return Template.instance().userMatches.get();
 	}
 });

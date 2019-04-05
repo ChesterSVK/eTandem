@@ -12,6 +12,8 @@ import ListIcon from '@material-ui/icons/List';
 import SchoolIcon from '@material-ui/icons/School';
 import AssignmentIndIcon from '@material-ui/icons/AssignmentInd';
 import PeopleIcon from '@material-ui/icons/People';
+import { t } from 'meteor/rocketchat:utils';
+
 
 const styles = theme => ({
     root: {
@@ -47,15 +49,15 @@ function SimpleList(props) {
                 {Meteor.user().name}
             </h3>
             <Divider className={classes.divider} />
-            <List component="nav" className={classes.no_padding}>
-                <h4 className={"rooms-list__type " + classes.no_padding_bottom}>
+            <List component="nav">
+                <h3 className={"rooms-list__type " + classes.no_padding_bottom}>
                     <ListItemLink href="/languagePreferences" className={"sidebar-item tandem-link"} >
                         <ListItemIcon>
                             <ListIcon/>
                         </ListItemIcon>
-                        <ListItemText primary="Preferences"/>
+                        <ListItemText primary={t('Preferences')}/>
                     </ListItemLink>
-                </h4>
+                </h3>
             </List>
             <List component="nav">
                 <h3 className={"rooms-list__type " + classes.no_padding_bottom}>
@@ -63,13 +65,13 @@ function SimpleList(props) {
                         <ListItemIcon>
                             <PeopleIcon/>
                         </ListItemIcon>
-                        <ListItemText primary="Matches"/>
+                        <ListItemText primary={t('Matches')}/>
                     </ListItemLink>
                 </h3>
             </List>
             <List component="nav">
                 <h3 className={"rooms-list__type " + classes.no_padding_bottom}>
-                    <ListItemLink href="https://learning2.uta.fi/?lang=en" target="_blank" className={"sidebar-item tandem-link"}>
+                    <ListItemLink href="https://digicampus.fi/course/view.php?id=33" target="_blank" className={"sidebar-item tandem-link"}>
                         <ListItemIcon>
                             <SchoolIcon/>
                         </ListItemIcon>
@@ -77,14 +79,14 @@ function SimpleList(props) {
                     </ListItemLink>
                 </h3>
             </List>
-            { props.showStudentsLink &&
+            { props.showListMatchesLink &&
                 <List component="nav">
                     <h3 className={"rooms-list__type " + classes.no_padding_bottom}>
-                        <ListItemLink href="/listStudents" className={"sidebar-item tandem-link"}>
+                        <ListItemLink href="/listMatches" className={"sidebar-item tandem-link"}>
                             <ListItemIcon>
                                 <AssignmentIndIcon/>
                             </ListItemIcon>
-                            <ListItemText primary="My students"/>
+                            <ListItemText primary={t('My_matches')}/>
                         </ListItemLink>
                     </h3>
                 </List>

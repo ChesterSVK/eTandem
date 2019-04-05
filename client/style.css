@@ -8,13 +8,99 @@
 	margin: -1.3rem -2rem;
 	z-index: 1;
 }
-.tandem-page-content-header .rc-header__wrap{
+
+.tandem-page-content-header .rc-header__wrap {
 	background-color: inherit;
 }
-.tandem-page-content-header .rc-header{
+
+.tandem-page-content-header .rc-header {
 	padding: 0;
 }
 
 /***********************************************************************************************************************	Matchmaking */
 /***********************************************************************************************************************	Preferences */
 /***********************************************************************************************************************	Students List */
+#tandemLoading.tandem-loading {
+	background-color: #5165d0cf;
+}
+
+#tandemLoading.tandem-loading .bounce {
+	background-color: #fff;
+}
+
+.match-modal__status {
+
+}
+
+.match-modal__status-bullet {
+	position: absolute;
+	right: 15px;
+	top: 48px;
+	display: block;
+	width: 14px;
+	height: 14px;
+	pointer-events: none;
+	border-radius: 50%;
+}
+
+/***********************************************************************************************************************	Match Request */
+.tandemMatchingRequestHolder {
+	position: relative;
+}
+
+.tandem-request, .tandem-request-flash {
+	padding: 1.25rem;
+	-webkit-box-shadow: 0 1px 2px 0 rgba(31, 35, 41, 0.08);
+	box-shadow: 0 1px 2px 0 rgba(31, 35, 41, 0.08);
+	font-size: 1rem;
+	font-size: var(--header-title-font-size);
+	text-align: center;
+	position: relative;
+}
+
+.tandem-request .rc-button {
+	display: inline-block;
+}
+
+.tandem-request .rc-button.rc-button--success {
+	color: #FFFFFF;
+	color: var(--button-primary-text-color);
+	border: 0;
+	border-color: #2DE0A5;
+	border-color: var(--rc-color-success);
+	background-color: #2DE0A5;
+	background-color: var(--rc-color-success);
+}
+
+.tandem-request-flash {
+	position: absolute;
+	width: 100%;
+	z-index: 11;
+}
+
+.tandem-request-flash .tandem-request-close-holder {
+	position: absolute;
+	right: 26px;
+}
+
+.tandem-request-flash.flash-bg-DECLINED {
+	color: #FFFFFF;
+	color: var(--button-primary-text-color);
+	background-color: #F5455C;
+	background-color: var(--rc-color-error);
+}
+
+.tandem-request-flash.flash-bg-PENDING {
+	color: #FFFFFF;
+	color: var(--button-primary-text-color);
+	background-color: #FFD21F;
+	background-color: var(--rc-color-alert);
+}
+
+.tandem-request-flash.flash-bg-COMPLETED {
+	color: #FFFFFF;
+	color: var(--button-primary-text-color);
+	background-color: #2DE0A5;
+	background-color: var(--rc-color-success);
+}
+

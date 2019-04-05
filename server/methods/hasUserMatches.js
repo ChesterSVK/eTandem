@@ -5,14 +5,10 @@ import { Roles } from 'meteor/rocketchat:models';
 import TandemUserMatches from '../models/TandemUsersMatches'
 
 Meteor.methods({
-	hasUserStudents() {
+	hasUserMatches() {
 		if (!Meteor.userId()) {
 			return false;
 		}
-		const fields = {
-			teacherId: 1,
-			unmatched: 1
-		};
-		return TandemUserMatches.findAsTeacher(Meteor.userId(), false).fetch().length > 0;
+		return TandemUserMatches.findMatches(Meteor.userId(), false).fetch().length > 0;
 	},
 });

@@ -14,6 +14,7 @@ Meteor.startup(function() {
 		{ _id: 'tandem-report-user',		    roles : ['admin', 'tandem-student'] },
 		{ _id: 'tandem-unmatch',			    roles : ['admin', 'tandem-student'] },
 		{ _id: 'tandem-ui-sort',			    roles : ['admin'] },
+		{ _id: 'tandem-ui-view-mode',		    roles : ['admin'] },
 	];
 
 	for (const permission of permissions) {

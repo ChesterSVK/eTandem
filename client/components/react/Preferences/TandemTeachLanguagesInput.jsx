@@ -7,9 +7,7 @@ import Select from '@material-ui/core/Select';
 import Paper from '@material-ui/core/Paper';
 import { noLanguage, noLevel } from './TandemLanguageConstant'
 import TandemLanguages from '../../../models/TandemLanguages';
-
-import { t } from 'meteor/rocketchat:utils';
-import {LanguageLevelsEnum} from "../../../../lib/helperData";
+import {LanguageLevelsEnum} from '../../../../lib/helperData';
 
 
 
@@ -25,40 +23,29 @@ const styles = theme => ({
         marginLeft: 8
     },
     languageNameContainer: {
-        width: '40%',
+        width: '55%',
         height: 45,
         marginTop: 16
     },
     paperLanguage: {
         float: 'right',
-        width: '95%',
+        width: '75%',
         height: '100%',
         maxWidth: 300,
         minWidth: 100,
-        marginLeft: 8
+        marginRight: 8
     },
     levelNameContainer: {
-        width: '60%',
+        width: '45%',
         height: 45,
         marginTop: 16
     },
     paperLevel: {
         float: 'left',
-        width: '45%',
+        width: '75%',
         height: '100%',
-        maxWidth: 300,
-        marginLeft: 8
-    },
-    creditNameContainer: {
-        width: '25%',
-        height: 45,
-        marginTop: 16
-    },
-    paperCredit: {
-        float: 'left',
-        width: '45%',
-        height: '100%',
-        maxWidth: 300,
+        maxWidth: 200,
+        minWidth: 100,
         marginLeft: 8
     }
 });
@@ -69,25 +56,26 @@ const ITEM_PADDING_TOP = 8;
 const MenuProps = {
     PaperProps: {
         style: {
-            maxHeight: ITEM_HEIGHT * 6 + ITEM_PADDING_TOP
+            maxHeight: ITEM_HEIGHT * 4.5 + ITEM_PADDING_TOP
         }
     },
     getContentAnchorEl: null,
     anchorOrigin: {
         vertical: "bottom",
         horizontal: "left",
+
     }
 };
 
 function getAllowedLevels(){
-    const levels =  Object.keys(LanguageLevelsEnum);
+    const levels =  [ Object.keys(LanguageLevelsEnum)[4], Object.keys(LanguageLevelsEnum)[5] ];
     return levels.map(function (level) { return { _id: LanguageLevelsEnum[level], level: level } });
 }
 
-class StudyLanguagesInput extends React.Component {
+class TeachLanguagesInput extends React.Component {
     constructor(props) {
         super(props);
-        //console.log(props);
+
         const allLanguages = TandemLanguages.findAll().map(function (language) { return { _id: language._id, name: language.name } });
         this.state.allLanguages = allLanguages;
         const allLevel = getAllowedLevels();
@@ -110,17 +98,7 @@ class StudyLanguagesInput extends React.Component {
             this.state.pickedLevel = noLevel;
         }
 
-        const creList = [1, 2, 3, 4, 5];
-        this.state.creditList = creList;
-        const cre = creList.filter(credit => credit === props.credit)[0];
-        if (cre != null) {
-            this.state.pickedCredit = cre;
-        }
-        else {
-            this.state.pickedCredit = 0;
-        }
-
-        this.state.allPickedLanguages = props.pickedLanguages;
+        this.state.allPickedLanguages = props.pickedLanguages
         this.state.unavailableLanguages = props.unavailableLanguages;
     }
 
@@ -135,30 +113,22 @@ class StudyLanguagesInput extends React.Component {
             lvl = noLevel;
         }
 
-        let cre = this.state.creditList.filter(credit => credit === nextProps.credit)[0];
-        if (cre == null) {
-            cre = 0;
-        }
-
-
         this.setState({
             pickedLanguage: lang,
             pickedLevel: lvl,
             allPickedLanguages: nextProps.pickedLanguages,
-            unavailableLanguages: nextProps.unavailableLanguages,
-            pickedCredit: cre
+            unavailableLanguages: nextProps.unavailableLanguages
         }
             ,
             () => {
-                    //console.log(this.state);
+                //        console.log(this.state);
             });
+
     }
 
     state = {
         pickedLanguage: noLanguage,
         pickedLevel: noLevel,
-        pickedCredit: 0,
-        creditList: [],
         allLanguages: [],
         allLevel: []
     };
@@ -166,10 +136,9 @@ class StudyLanguagesInput extends React.Component {
     handleChangeValue = event => {
         this.setState({ [event.target.name]: event.target.value },
             () => {
-                this.props.changeStudyLanguageValue(
+                this.props.changeTeachLanguageValue(
                     this.state.pickedLanguage,
                     this.state.pickedLevel,
-                    this.state.pickedCredit,
                     this.props.index
                 )
             }
@@ -196,7 +165,6 @@ class StudyLanguagesInput extends React.Component {
                 });
                 disabled = disabled || (a.length > 0);
             }
-
             return <MenuItem
                 key={language._id}
                 value={language}
@@ -216,14 +184,6 @@ class StudyLanguagesInput extends React.Component {
         }
         );
 
-
-        const creditMenu = this.state.creditList.map((credit) =>
-            <MenuItem
-                key={credit}
-                value={credit}>
-                {credit}
-            </MenuItem>
-        );
         return (
             <div className={classes.root}>
                 <div className={classes.languageNameContainer}>
@@ -263,30 +223,15 @@ class StudyLanguagesInput extends React.Component {
                         </FormControl>
                     </Paper>
 
-                    <Paper className={classes.paperCredit}>
-                        <FormControl className={classes.formControl}>
-                            <Select
-                                value={this.state.pickedCredit}
-                                onChange={this.handleChangeValue}
-                                displayEmpty
-                                name="pickedCredit"
-                                className={classes.selectEmpty}
-                                MenuProps={MenuProps}
-                                disableUnderline
-                            >
-                                <MenuItem value={0}>{t("Credit")}</MenuItem>
-                                {creditMenu}
-                            </Select>
-                        </FormControl>
-                    </Paper>
+
                 </div>
             </div>
         );
     }
 }
 
-StudyLanguagesInput.propTypes = {
+TeachLanguagesInput.propTypes = {
     classes: PropTypes.object.isRequired,
 };
 
-export default withStyles(styles, { withTheme: true })(StudyLanguagesInput);
+export default withStyles(styles, { withTheme: true })(TeachLanguagesInput);

@@ -32,15 +32,15 @@ export class TandemLanguages extends Base {
 	}
 
 	findOneByLangCode(langCode) {
-		return this.findOne(langCode);
+		return this.findOne({code: langCode});
 	}
 
 	findOneByLangCodeAndName(langCode, langName) {
-		return this.findOne({langCode:langCode, langName: langName});
+		return this.findOne({code:langCode, name: langName});
 	}
 
 	findOneByLangName(langName) {
-		return this.findOne(langName);
+		return this.findOne({name: langName});
 	}
 
 	findOneById(langId) {

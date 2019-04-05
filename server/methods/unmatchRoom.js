@@ -3,6 +3,7 @@ import { check } from 'meteor/check';
 import { hasPermission } from 'meteor/rocketchat:authorization';
 import { Roles } from 'meteor/rocketchat:models';
 import TandemUserMatches from '../models/TandemUsersMatches'
+import TandemLanguageMatches from '../models/TandemLanguageMatches'
 
 Meteor.methods({
 	unmatchRoom(rid) {
@@ -10,6 +11,11 @@ Meteor.methods({
 
 		if (!Meteor.userId()) {
 			throw new Meteor.Error('error-invalid-user', 'Invalid user', {
+				method: 'unmatchRoom',
+			});
+		}
+		if (!hasPermission(Meteor.userId(), 'tandem-unmatch')) {
+			throw new Meteor.Error('error-not-allowed', 'Not allowed', {
 				method: 'unmatchRoom',
 			});
 		}
@@ -21,6 +27,8 @@ Meteor.methods({
 				method: 'unmatchRoom',
 			});
 		}
+
+		TandemLanguageMatches.hideMatch(match.languageMatch);
 
 		TandemUserMatches.unmatchMatch(match._id, true);
 

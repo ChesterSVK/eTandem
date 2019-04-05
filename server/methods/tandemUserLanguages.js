@@ -1,7 +1,7 @@
 import { Meteor } from 'meteor/meteor';
 import TandemUserLanguages  from '../models/TandemUserLanguages';
 import { Rooms }  from 'meteor/rocketchat:models';
-import {TeachingMotivationEnum} from "../../lib/teachingMotivation";
+import {TeachingMotivationEnum} from "../../lib/helperData";
 
 Meteor.methods({
 	'tandemUserLanguages/hasSomePreferences'() {
@@ -25,11 +25,19 @@ Meteor.methods({
 			});
 		}
 
-		TandemUserLanguages.deleteUserPreferences(Meteor.userId(), motivation);
 
 		let alreadyInserted = [];
 
 		if (lanugagePreferences && Array.isArray(lanugagePreferences)){
+
+			if (lanugagePreferences.length > 5){
+				throw new Meteor.Error('error-too-many-preferences', 'Limit is 5', {
+					method: 'tandemUserLanguages/setPreferences',
+				});
+			}
+
+			TandemUserLanguages.deleteUserPreferences(Meteor.userId(), motivation);
+
 			lanugagePreferences.forEach(function (preference) {
 				if (alreadyInserted.indexOf(preference.langId) === -1){
 					TandemUserLanguages.insertNew(Meteor.userId(), motivation, preference);
@@ -37,6 +45,10 @@ Meteor.methods({
 				}
 			})
 		}
+
+
+		//Call async matching method
+		Meteor.call('executeLanguageMatching', Meteor.userId(), TandemUserLanguages.findUserLanguages(Meteor.userId(), motivation).fetch());
 
 		return true;
 	},

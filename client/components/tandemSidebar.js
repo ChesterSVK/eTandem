@@ -5,30 +5,27 @@ import SimpleList from './react/SideBar/SideBar';
 import {Meteor} from "meteor/meteor";
 import TandemMatches from "./react/MatchMaking/TandemMatches";
 import { menu } from 'meteor/rocketchat:ui-utils';
+import { handleError } from 'meteor/rocketchat:utils';
 
 
 
 Template.tandemSidebar.onCreated(function () {
 // 1. Instance
 	const instance = this;
-	this.hasUserStudents = new ReactiveVar(false);
+	this.hasUserMatches = new ReactiveVar(false);
 	// 2. Autorun
 	instance.autorun(function () {
-		Meteor.call('hasUserStudents', function (error, results) {
+		Meteor.call('hasUserMatches', function (error, results) {
 			if (error) {
 				handleError(error);
 			}
 
-			instance.hasUserStudents.set(results);
+			instance.hasUserMatches.set(results);
 			return results;
 		});
 	});
 })
 ;
-
-Template.tandemSidebar.rendered = function () {
-
-};
 
 Template.tandemSidebar.events({
 	'click .tandem-link' () {
@@ -38,8 +35,8 @@ Template.tandemSidebar.events({
 
 
 Template.tandemSidebar.helpers({
-	hasUserStudents() {
-		return Template.instance().hasUserStudents.get();
+	hasUserMatches() {
+		return Template.instance().hasUserMatches.get();
 	},
 	TandemSidebar() {
 		return SimpleList;

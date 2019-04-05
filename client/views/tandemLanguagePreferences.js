@@ -2,7 +2,7 @@ import TandemPreferences from '../components/react/Preferences/TandemPreferences
 import TandemLanguages from '../models/TandemLanguages'
 import TandemLanguageLevels from '../models/TandemLanguageLevels'
 import TandemUserLanguages from '../models/TandemUserLanguages'
-import { TeachingMotivationEnum  } from '../../lib/teachingMotivation'
+import { TeachingMotivationEnum  } from '../../lib/helperData'
 import { t } from 'meteor/rocketchat:utils';
 import s from "underscore.string";
 
@@ -41,9 +41,9 @@ Template.tandemLanguagePreferences.onCreated(function () {
 })
 ;
 
-Template.tandemLanguagePreferences.rendered = function () {
-
-};
+Template.tandemLanguagePreferences.onRendered(function() {
+	$('#tandemLoading').hide();
+});
 
 Template.tandemLanguagePreferences.helpers({
 	title(){

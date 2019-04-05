@@ -7,6 +7,10 @@ export class TandemUsersMatches extends Base {
 
 
 	}
+
+	findAll(){
+		return this.find({});
+	}
 }
 
 export default new TandemUsersMatches();

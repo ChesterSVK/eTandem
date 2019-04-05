@@ -25,9 +25,9 @@ export class TandemUserLanguages extends Base {
 		return this.find({userId: userId});
 	}
 
-	findTeachingLanguages(userId, langId, motivation) {
-		return this.findOne({userId: userId, langId: langId, motivation: motivation});
-	}
+	// findTeachingLanguages(userId, langId, motivation) {
+	// 	return this.findOne({userId: userId, langId: langId, motivation: motivation});
+	// }
 
 	findUserLanguages(userId, motivation) {
 		return this.find({userId: userId, motivation: motivation});

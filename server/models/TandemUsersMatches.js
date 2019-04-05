@@ -1,4 +1,5 @@
 import { Base } from 'meteor/rocketchat:models';
+import {MatchingRequestStateEnum} from '../../lib/helperData'
 
 export class TandemUsersMatches extends Base {
 	constructor() {
@@ -6,6 +7,7 @@ export class TandemUsersMatches extends Base {
 
 		this.model.before.insert((userId, doc) => {
 			doc.unmatched = false;
+			doc.status = MatchingRequestStateEnum.PENDING;
 			doc.reportedUsers = [];
 
 		});
@@ -13,7 +15,7 @@ export class TandemUsersMatches extends Base {
 		this.tryEnsureIndex({
 			studentId: 1,
 			teacherId: 1,
-			langName: 1
+			languageMatch : 1
 		}, {
 			unique: 1,
 		});
@@ -22,6 +24,18 @@ export class TandemUsersMatches extends Base {
 			roomId: 1,
 		}, {
 			unique: 1,
+		});
+	}
+
+
+	createUserMatchByLanguageMatch(userId, languageMatch, roomId, matchingLangId, symetricLangId){
+		return this.insert({
+			languageMatch : languageMatch._id,
+			studentId : userId,
+			teacherId : languageMatch.teacher._id,
+			roomId : roomId,
+			matchingLanguage: matchingLangId,
+			symetricLanguage: symetricLangId,
 		});
 	}
 
@@ -62,8 +76,20 @@ export class TandemUsersMatches extends Base {
 		return this.find(options);
 	}
 
-	findOneByStudentAndTeacher(studentId, teacherId) {
-		return this.findOne({studentId: studentId, teacherId: teacherId});
+	findMatches(userId, unmatched = false){
+		return this.find({ $or : [{teacherId: userId}, {studentId: userId}], unmatched: unmatched});
+	}
+
+	findOneByRoomId(roomId){
+		return this.findOne({roomId: roomId});
+	}
+
+	acceptMatchRequest(roomId){
+		return this.update({roomId: roomId}, {$set : {status : MatchingRequestStateEnum.ACCEPTED}});
+	}
+
+	declineMatchRequest(roomId){
+		return this.update({roomId: roomId}, {$set : {status : MatchingRequestStateEnum.DECLINED}});
 	}
 
 	findAsTeacher(teacherId, unmatched = false) {
@@ -73,7 +99,6 @@ export class TandemUsersMatches extends Base {
 	findAsStudent(studentId, unmatched = false) {
 		return this.find({studentId: studentId, unmatched: unmatched});
 	}
-
 
 	removeById(matchId) {
 		return this.remove(matchId);
