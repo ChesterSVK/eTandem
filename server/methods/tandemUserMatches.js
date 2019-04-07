@@ -2,8 +2,9 @@ import {Meteor} from 'meteor/meteor';
 import TandemUsersMatches from '../models/TandemUsersMatches';
 import TandemLanguages from '../models/TandemLanguages';
 import TandemLanguageMatches from '../models/TandemLanguageMatches';
-import {Roles, Rooms, Users} from 'meteor/rocketchat:models';
+import {Roles, Rooms, Users, Messages} from 'meteor/rocketchat:models';
 import {check} from 'meteor/check';
+import { t } from 'meteor/rocketchat:utils';
 import {MatchingRequestStateEnum} from "../../lib/helperData";
 
 
@@ -28,25 +29,11 @@ Meteor.methods({
 		return TandemUsersMatches.findByUserId(this.userId).fetch().length > 0;
 	},
 
-	'tandemUserMatches/getAsTeacher'() {
-		if (!this.userId) {
-			return ready();
-		}
-		return TandemUsersMatches.findAsTeacher(this.userId).fetch();
-	},
-
-	'tandemUserMatches/getAsStudent'() {
-		if (!this.userId) {
-			return ready();
-		}
-		return TandemUsersMatches.findAsStudent(this.userId).fetch();
-	},
-
 	'tandemUserMatches/getMatchingRequest'(roomId) {
 		if (!this.userId) {
 			return false;
 		}
-		if (!roomId) {
+		if (roomId == null || roomId === undefined) {
 			return false;
 		}
 		check(roomId, String);
@@ -108,6 +95,8 @@ Meteor.methods({
 			throw new Meteor.Error('error-invalid-match', 'Invalid match', {method: 'tandemUserMatches/createMatchingRequest'});
 		}
 
+		Messages.createWithTypeRoomIdMessageAndUser(undefined, roomId, t("get_request_welcome_message", { lang1: match.matchingLanguage, lang2: match.languagesInMatch[0] === match.matchingLanguage ? match.languagesInMatch[1] : match.languagesInMatch[0] }), Meteor.user(), {});
+
 		TandemLanguageMatches.hideMatch(match._id);
 
 		Roles.addUserRoles(this.userId, ['tandem-student'], {});
@@ -116,7 +105,8 @@ Meteor.methods({
 		const matchingLangId = TandemLanguages.findOneByLangName(match.matchingLanguage)._id;
 		const symetricLangId = TandemLanguages.findOneByLangName(getSymetricLang(match.languagesInMatch, match.matchingLanguage))._id;
 
-		return TandemUsersMatches.createUserMatchByLanguageMatch(this.userId, match, roomId, matchingLangId, symetricLangId);
+		TandemUsersMatches.createUserMatchByLanguageMatch(this.userId, match, roomId, matchingLangId, symetricLangId);
+		return Rooms.findOneByIdOrName(roomId);
 	},
 
 	'tandemUserMatches/transform' (matches) {
@@ -128,15 +118,7 @@ Meteor.methods({
 		}
 
 		return matches.map(function (match) {
-			return {
-				status: match.status,
-				unmatched: match.unmatched,
-				symetricLanguage : match.symetricLanguage ? TandemLanguages.findOneById(match.symetricLanguage).name : "",
-				matchingLanguage : TandemLanguages.findOneById(match.matchingLanguage).name,
-				roomName : Rooms.findOneByIdOrName(match.roomId).name,
-				student : Users.findOneById(match.studentId),
-				teacher : Users.findOneById(match.teacherId),
-			};
+			return getMatchObject(match);
 		});
 	},
 
@@ -146,16 +128,26 @@ Meteor.methods({
 		}
 
 		const query = {
-			$or: [
-				{ studentId: this.userId },
-				{ teacherId: this.userId },
-			],
+			users: this.userId,
 			status: {
 				$in: [MatchingRequestStateEnum.ACCEPTED, MatchingRequestStateEnum.COMPLETED, MatchingRequestStateEnum.PENDING]
 			},
 			unmatched: false,
 		};
 
-		return TandemUsersMatches.findWithOptions(query);
+		return TandemUsersMatches.findWithOptions(query).fetch();
 	},
 });
+
+
+function getMatchObject(match) {
+	return {
+		status: match.status,
+		unmatched: match.unmatched,
+		roomName : Rooms.findOneByIdOrName(match.roomId).name,
+		matchingLanguage : TandemLanguages.findOneById(match.matchingLanguage.matchingLanguageId).name,
+		symetricLanguage : TandemLanguages.findOneById(match.symetricLanguage.symetricLanguageId).name,
+		matchingLanguageTeacher : Users.findOneById(match.matchingLanguage.matchingLanguageTeacherId),
+		symetricLanguageTeacher : Users.findOneById(match.symetricLanguage.symetricLanguageTeacherId),
+	};
+}

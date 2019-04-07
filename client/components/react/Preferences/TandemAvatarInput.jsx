@@ -31,7 +31,7 @@ class AvatarInput extends React.Component {
         file : ''
     }
 
-    handleChange = (event) => { 
+    handleChange = (event) => {
         const url = URL.createObjectURL(event.target.files[0]);
         this.setState({
             file: url
@@ -44,16 +44,16 @@ class AvatarInput extends React.Component {
         const { classes } = this.props;
         return (
             <div>
-                    {/* <IconButton color="primary" 
-                    className={classes.button} 
-                    component="span" 
+                    {/* <IconButton color="primary"
+                    className={classes.button}
+                    component="span"
                     href="http://suikero.tech:3000/account/profile"
                     target="_blank">
                         <PhotoCamera />
                     </IconButton>     */}
 
 
-                    <IconButton className={classes.button} 
+                    <IconButton className={classes.button}
                     color="primary"
                     size="big"
                     href="/account/profile"

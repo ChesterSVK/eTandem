@@ -109,10 +109,8 @@ class TandemGeneralPreferencesInput extends React.Component {
 
 
     state = {
-        checkedExcluded: getUserPreference(Meteor.user(), 'tandemExcludeFromMatching'),
-        checkedSymetricMatching: getUserPreference(Meteor.user(), 'tandemSymetricMatching'),
-        checkedSymetricLangs: getUserPreference(Meteor.user(), 'tandemSymetricLanguageLevels'),
-        // checkedAllowMultipleTeachings: getUserPreference(Meteor.user(), 'tandemAllowMultipleTeachings', false),
+        checkedExcluded: getUserPreference(Meteor.user(), 'tandemExcludeFromMatching', false),
+        checkedAllowMultipleTeachings: getUserPreference(Meteor.user(), 'tandemAllowMultipleTeachings', false),
     };
 
     handleChange = name => event => {
@@ -129,9 +127,7 @@ class TandemGeneralPreferencesInput extends React.Component {
         Meteor.call('reloadLanguageMatching',
             {
                 tandemExcludeFromMatching : this.state.checkedExcluded,
-                tandemSymetricMatching: this.state.checkedSymetricMatching,
-                tandemSymetricLanguageLevels: this.state.checkedSymetricLangs,
-                // tandemAllowMultipleTeachings: this.state.checkedAllowMultipleTeachings,
+                tandemAllowMultipleTeachings: this.state.checkedAllowMultipleTeachings,
             } ,
             success(() => toastr.success(t("Message_Saving_Preference"), t("Title_Saving_Preference"))));
     }
@@ -166,64 +162,21 @@ class TandemGeneralPreferencesInput extends React.Component {
                             </ListItem>
                             <Divider />
                             <ListItem>
-                                <ListItemText primary={t("matchmaking_preference_symetric_match")} />
+                                <ListItemText primary={t("matchmaking_preference_multiple_teachings")} />
                                 <FormControlLabel
                                     control={
                                         <Switch
-                                            checked={this.state.checkedSymetricMatching}
-                                            onChange={this.handleChange('checkedSymetricMatching')}
-                                            value="checkedSymetricMatching"
+                                            checked={this.state.checkedAllowMultipleTeachings}
+                                            onChange={this.handleChange('checkedAllowMultipleTeachings')}
+                                            value="checkedAllowMultipleTeachings"
                                             color="primary"
+                                            disabled={this.state.checkedExcluded}
                                         />
                                     }
-                                    label={this.state.checkedSymetricMatching ? t("Yes") : t("No")}
+                                    label={this.state.checkedAllowMultipleTeachings ? t("Yes") : t("No")}
                                 />
-                                <Tooltip title={t("matchmaking_preference_symetric_match_i")}
-                                         aria-label={t("matchmaking_preference_symetric_match_i")}>
-                                    <IconButton className={classes.infoButton} size="big">
-                                        <InfoIcon fontSize="large" color="secondary"/>
-                                    </IconButton>
-                                </Tooltip>
-                            </ListItem>
-                            <Divider />
-                            {/*<ListItem>*/}
-                                {/*<ListItemText primary={t("matchmaking_preference_multiple_teachings")} />*/}
-                                {/*<FormControlLabel*/}
-                                    {/*control={*/}
-                                        {/*<Switch*/}
-                                            {/*checked={this.state.checkedAllowMultipleTeachings}*/}
-                                            {/*onChange={this.handleChange('checkedAllowMultipleTeachings')}*/}
-                                            {/*value="checkedAllowMultipleTeachings"*/}
-                                            {/*color="primary"*/}
-                                            {/*disabled={this.state.checkedExcluded}*/}
-                                        {/*/>*/}
-                                    {/*}*/}
-                                    {/*label={this.state.checkedAllowMultipleTeachings ? t("Yes") : t("No")}*/}
-                                {/*/>*/}
-                                {/*<Tooltip title={t("matchmaking_preference_multiple_teachings_i")}*/}
-                                         {/*aria-label={t("matchmaking_preference_multiple_teachings_i")}>*/}
-                                    {/*<IconButton className={classes.infoButton} size="big">*/}
-                                        {/*<InfoIcon fontSize="large" color="secondary"/>*/}
-                                    {/*</IconButton>*/}
-                                {/*</Tooltip>*/}
-                            {/*</ListItem>*/}
-                            {/*<Divider />*/}
-                            <ListItem>
-                                <ListItemText primary={t("matchmaking_preference_symetric_langs")} />
-                                <FormControlLabel
-                                    control={
-                                        <Switch
-                                            checked={this.state.checkedSymetricLangs}
-                                            onChange={this.handleChange('checkedSymetricLangs')}
-                                            value="checkedSymetricLangs"
-                                            color="primary"
-                                            disabled={!this.state.checkedSymetricMatching}
-                                        />
-                                    }
-                                    label={this.state.checkedSymetricLangs ? t("Yes") : t("No")}
-                                />
-                                <Tooltip title={t("matchmaking_preference_symetric_langs_i")}
-                                         aria-label={t("matchmaking_preference_symetric_langs_i")}>
+                                <Tooltip title={t("matchmaking_preference_multiple_teachings_i")}
+                                         aria-label={t("matchmaking_preference_multiple_teachings_i")}>
                                     <IconButton className={classes.infoButton} size="big">
                                         <InfoIcon fontSize="large" color="secondary"/>
                                     </IconButton>

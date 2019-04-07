@@ -13,53 +13,58 @@ export class TandemUsersMatches extends Base {
 		});
 
 		this.tryEnsureIndex({
-			studentId: 1,
-			teacherId: 1,
-			languageMatch : 1
-		}, {
-			unique: 1,
-		});
-
-		this.tryEnsureIndex({
 			roomId: 1,
 		}, {
 			unique: 1,
 		});
 	}
 
-
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////	Insert
 	createUserMatchByLanguageMatch(userId, languageMatch, roomId, matchingLangId, symetricLangId){
 		return this.insert({
-			languageMatch : languageMatch._id,
-			studentId : userId,
-			teacherId : languageMatch.teacher._id,
+			requestedBy: userId,
+			users : [userId, languageMatch.teacher._id],
 			roomId : roomId,
-			matchingLanguage: matchingLangId,
-			symetricLanguage: symetricLangId,
+			matchingLanguage: {
+				matchingLanguageId : matchingLangId,
+				matchingLanguageTeacherId : languageMatch.teacher._id,
+			},
+			symetricLanguage: {
+				symetricLanguageId : symetricLangId,
+				symetricLanguageTeacherId : userId
+			},
 		});
 	}
 
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////	Find
 	findByUserId(userId) {
 		const query = {
-			$or: [
-				{ studentId: userId },
-				{ teacherId: userId },
-			],
+			users : userId,
 		};
 		return this.find(query);
 	}
 
 	findByUserIdAndRoomId(userId, roomId) {
 		const query = {
-			$or: [
-				{ studentId: userId },
-				{ teacherId: userId },
-			],
+			users : userId,
 			roomId : roomId
 		};
 		return this.findOne(query);
 	}
 
+	findWithOptions(options){
+		return this.find(options);
+	}
+
+	findMatches(userId, unmatched = false){
+		return this.find({ users : userId, unmatched: unmatched});
+	}
+
+	findOneByRoomId(roomId){
+		return this.findOne({roomId: roomId});
+	}
+
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////	Custom
 	reportUserInMatch(fromUserId, matchId, reportedUserId) {
 		return this.update({_id: matchId}, {
 			$push : {
@@ -72,32 +77,12 @@ export class TandemUsersMatches extends Base {
 		return this.update({_id: matchId}, { $set : { unmatched : state}});
 	}
 
-	findWithOptions(options){
-		return this.find(options);
-	}
-
-	findMatches(userId, unmatched = false){
-		return this.find({ $or : [{teacherId: userId}, {studentId: userId}], unmatched: unmatched});
-	}
-
-	findOneByRoomId(roomId){
-		return this.findOne({roomId: roomId});
-	}
-
 	acceptMatchRequest(roomId){
 		return this.update({roomId: roomId}, {$set : {status : MatchingRequestStateEnum.ACCEPTED}});
 	}
 
 	declineMatchRequest(roomId){
 		return this.update({roomId: roomId}, {$set : {status : MatchingRequestStateEnum.DECLINED}});
-	}
-
-	findAsTeacher(teacherId, unmatched = false) {
-		return this.find({teacherId: teacherId, unmatched: unmatched});
-	}
-
-	findAsStudent(studentId, unmatched = false) {
-		return this.find({studentId: studentId, unmatched: unmatched});
 	}
 
 	removeById(matchId) {

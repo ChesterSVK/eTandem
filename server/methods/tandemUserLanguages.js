@@ -1,6 +1,6 @@
 import { Meteor } from 'meteor/meteor';
-import TandemUserLanguages  from '../models/TandemUserLanguages';
 import { Rooms }  from 'meteor/rocketchat:models';
+import TandemUserLanguages  from '../models/TandemUserLanguages';
 import {TeachingMotivationEnum} from "../../lib/helperData";
 
 Meteor.methods({
@@ -25,9 +25,7 @@ Meteor.methods({
 			});
 		}
 
-
 		let alreadyInserted = [];
-
 		if (lanugagePreferences && Array.isArray(lanugagePreferences)){
 
 			if (lanugagePreferences.length > 5){
@@ -46,10 +44,7 @@ Meteor.methods({
 			})
 		}
 
-
-		//Call async matching method
 		Meteor.call('executeLanguageMatching', Meteor.userId(), TandemUserLanguages.findUserLanguages(Meteor.userId(), motivation).fetch());
-
 		return true;
 	},
 

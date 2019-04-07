@@ -5,7 +5,6 @@ import { Roles, Permissions } from 'meteor/rocketchat:models';
 Meteor.startup(function() {
 	// Note:
 	// 1.if we need to create a role that can only edit channel message, but not edit group message
-	// then we can define edit-<type>-message instead of edit-message
 	// 2. admin, moderator, and user roles should not be deleted as they are referened in the code.
 	const permissions = [
 		// Tandem addition

@@ -1,3 +1,13 @@
+import {Meteor} from 'meteor/meteor';
+import {settings} from 'meteor/rocketchat:settings';
+import {getUserPreference} from 'meteor/rocketchat:utils';
+import { FlowRouter } from 'meteor/kadira:flow-router';
+import { AutoComplete } from 'meteor/mizzao:autocomplete';
+import { callbacks } from 'meteor/rocketchat:callbacks';
+import { t, roomTypes } from 'meteor/rocketchat:utils';
+import { hasAllPermission } from 'meteor/rocketchat:authorization';
+import toastr from "toastr";
+
 import React from 'react';
 import Button from '@material-ui/core/Button';
 import Dialog from '@material-ui/core/Dialog';
@@ -7,27 +17,12 @@ import Blaze from 'meteor/gadicc:blaze-react-component';
 import Typography from '@material-ui/core/Typography';
 import PropTypes from 'prop-types';
 import {withStyles} from '@material-ui/core/styles';
-import {getUserPreference} from 'meteor/rocketchat:utils';
-
-
-import { FlowRouter } from 'meteor/kadira:flow-router';
-import { AutoComplete } from 'meteor/mizzao:autocomplete';
-import { callbacks } from 'meteor/rocketchat:callbacks';
-import { t, roomTypes } from 'meteor/rocketchat:utils';
-import { hasAllPermission } from 'meteor/rocketchat:authorization';
-
-import {Meteor} from 'meteor/meteor';
-import {settings} from 'meteor/rocketchat:settings';
-
 import List from '@material-ui/core/List';
 import ListItem from '@material-ui/core/ListItem';
 import ListItemText from '@material-ui/core/ListItemText';
-import toastr from 'toastr';
-
 import Card from '@material-ui/core/Card';
 import CardContent from '@material-ui/core/CardContent';
 import CardActionArea from '@material-ui/core/CardActionArea';
-
 
 const styles = ({
   dialogRoot: {},
@@ -43,7 +38,11 @@ const styles = ({
       padding: "0.3em 1.3em",
   },
   listItem: {
-      padding: "16px 2em"
+      paddingTop: 16,
+      paddingBottom: 16,
+      paddingLeft: "2em",
+      paddingRight: "2em",
+      minWidth: 300
   },
   card: {
     maxWidth: 336,
@@ -90,15 +89,16 @@ function createChannel(match) {
             if (err.error === 'error-duplicate-channel-name') {
                 toastr.error(t("error-duplicate-channel-name", { channel_name: name }), t("error-duplicate-channel-name", { channel_name: name }));
             }
+            console.log(err);
         }
         else {
-            Meteor.call('tandemUserMatches/createMatchingRequest', match, result.rid, (error, result) => {
-                if (error){
+            Meteor.call('tandemUserMatches/createMatchingRequest', match, result.rid, (error1, result1) => {
+                if (error1){
                     toastr.error(t("error-creating-user-match"));
                 }
                 else {
                     toastr.success(t("success-creating-user-match"));
-                    return FlowRouter.go('group', { name: name }, FlowRouter.current().queryParams);
+                    return FlowRouter.go('group', { name: result1.name }, FlowRouter.current().queryParams);
                 }
             });
         }
@@ -120,6 +120,7 @@ class MatchProfileModal extends React.Component {
     };
 
     handleRequest = (match) => {
+        // console.log(match);
         createChannel(match);
         this.setState({open: false});
     };
@@ -161,26 +162,34 @@ class MatchProfileModal extends React.Component {
                   aria-labelledby="alert-dialog-title"
                   aria-describedby="alert-dialog-description"
               >
-                  <DialogContent className={classes.dialogContent}>
-                      <Typography variant="h4" gutterBottom className={classes.dialogUserName}>
+                  <DialogContent className={classes.dialogContent + '  tandem-dialog-content'}>
+                      <Typography variant="h4" className={classes.dialogUserName + " sidebar__header-status-bullet--" + this.props.match.teacher.status}>
                           {this.props.match.teacher.name}
                       </Typography>
-                      <span className="match-modal__status">
-                      <div
-                          className={"match-modal__status-bullet sidebar__header-status-bullet--" + this.props.match.teacher.status}/>
-                      </span>
                       <div className={classes.avatarHolder}>
                           <Blaze template="avatar"
                                   username={this.props.match.teacher.username}/>
                       </div>
                       <List component="nav">
                           <ListItem className={classes.listItem}>
-                              <ListItemText secondary={t("teaches")}/>
-                              <ListItemText primary={this.props.match.matchingLanguage}/>
+                              {this.props.match.teacher.customFields && this.props.match.teacher.customFields.tandemSentence ?
+                                  <div>
+                                      <ListItemText secondary={t("about_me")}/>
+                                      <ListItemText primary={this.props.match.teacher.customFields.tandemSentence}/>
+                                  </div>
+                                  : ""}
                           </ListItem>
                           <ListItem className={classes.listItem}>
-                              <ListItemText secondary={t("looks_for")}/>
-                              <ListItemText primary={this.getTeachersLanguage(this.props.match.languagesInMatch, this.props.match.matchingLanguage)} />
+                              <div>
+                                  <ListItemText secondary={t("teaches")}/>
+                                  <ListItemText primary={this.props.match.matchingLanguage}/>
+                              </div>
+                          </ListItem>
+                          <ListItem className={classes.listItem}>
+                              <div>
+                                  <ListItemText secondary={t("looks_for")}/>
+                                  <ListItemText primary={this.getTeachersLanguage(this.props.match.languagesInMatch, this.props.match.matchingLanguage)} />
+                              </div>
                           </ListItem>
                       </List>
                   </DialogContent>

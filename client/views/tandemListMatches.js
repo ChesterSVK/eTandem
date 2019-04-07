@@ -1,7 +1,8 @@
+import { Meteor } from 'meteor/meteor';
+import { ReactiveVar } from 'meteor/reactive-var';
+import { Template } from 'meteor/templating';
 import TandemListMatches from '../components/react/MatchMaking/ListMatches';
 import { t, handleError } from 'meteor/rocketchat:utils';
-import { ReactiveVar } from 'meteor/reactive-var';
-import { Meteor } from 'meteor/meteor';
 
 Template.tandemListMatches.onCreated(function () {
 	// 1. Instance
@@ -16,7 +17,6 @@ Template.tandemListMatches.onCreated(function () {
 			}
 
 			instance.userMatches.set(results);
-			return results;
 		});
 	});
 })

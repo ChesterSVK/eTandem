@@ -11,19 +11,19 @@ export class TandemLanguageMatches extends Base {
 	}
 
 	createAsymetricMatchAsStudent(studentId, match){
-		return this.insert({symetricLangLevels: false, symetric : false, usersInMatch: [studentId, match.userId], languagesInMatch: [match.langId]});
+		return this.insert({symetric : false, usersInMatch: [studentId, match.userId], languagesInMatch: [match.langId]});
 	}
 
 	createAsymetricMatchAsTeacher(teacherId, match){
-		return this.insert({symetricLangLevels: false, symetric : false, usersInMatch: [teacherId, match.userId], languagesInMatch: [match.langId]});
+		return this.insert({symetric : false, usersInMatch: [teacherId, match.userId], languagesInMatch: [match.langId]});
 	}
 
-	createSymetricMatchAsStudent(studentId, match, symetricLanguageId, symetricLangLevels){
- 		return this.insert({symetricLangLevels: symetricLangLevels, symetric : true, usersInMatch: [studentId, match.userId], languagesInMatch: [match.langId, symetricLanguageId]});
+	createSymetricMatchAsStudent(studentId, match, symetricLanguageId){
+ 		return this.insert({symetric : true, usersInMatch: [studentId, match.userId], languagesInMatch: [match.langId, symetricLanguageId]});
 	}
 
-	createSymetricMatchAsTeacher(teacherId, match, symetricLanguageId, symetricLangLevels){
-		return this.insert({symetricLangLevels: symetricLangLevels, symetric : true,  usersInMatch: [teacherId, match.userId], languagesInMatch: [match.langId, symetricLanguageId]});
+	createSymetricMatchAsTeacher(teacherId, match, symetricLanguageId){
+		return this.insert({symetric : true,  usersInMatch: [teacherId, match.userId], languagesInMatch: [match.langId, symetricLanguageId]});
 	}
 
 	hideMatch(matchId){

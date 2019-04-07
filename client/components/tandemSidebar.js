@@ -3,7 +3,6 @@ import {settings} from 'meteor/rocketchat:settings';
 import './tandemSidebar.html';
 import SimpleList from './react/SideBar/SideBar';
 import {Meteor} from "meteor/meteor";
-import TandemMatches from "./react/MatchMaking/TandemMatches";
 import { menu } from 'meteor/rocketchat:ui-utils';
 import { handleError } from 'meteor/rocketchat:utils';
 

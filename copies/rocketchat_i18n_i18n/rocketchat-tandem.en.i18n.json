@@ -47,6 +47,7 @@
   "Edit_your_preferences" : "Edit your preferences",
   "Can_teach" : "Can teach ",
   "Matches" : "Language matches",
+  "Matchmaking" : "Matchmaking",
   "My_matches" : "My matches",
   "Unmatch" : "Unmatch",
   "List_Matches" : "List matches",
@@ -84,5 +85,8 @@
   "match_as_teacher" : "(As teacher)",
   "Sentence_about_yourself" : "Sentence about yourself",
   "Tell_us_about_yourself" : "Tell us something about you",
-  "Sentence_Change_Disabled" : "Sentence change disabled"
+  "Sentence_Change_Disabled" : "Sentence change disabled",
+  "about_me" : "About me: ",
+  "preference_missing_language" : "Your language is not here? Let us know.",
+  "get_request_welcome_message" : "Hi I would like to learn __lang1__ and a little bird told me that you are looking for someone to teach you __lang2__. Do you accept this request?"
 }

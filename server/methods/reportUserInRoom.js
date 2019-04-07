@@ -2,7 +2,7 @@ import { Meteor } from 'meteor/meteor';
 import { Match, check } from 'meteor/check';
 import { Rooms, Subscriptions, Users, Messages } from 'meteor/rocketchat:models';
 import { hasPermission } from 'meteor/rocketchat:authorization';
-import TandemUserMatches from '../models/TandemUsersMatches';
+import TandemUsersMatches from '../models/TandemUsersMatches';
 import * as Mailer from 'meteor/rocketchat:mailer';
 
 Meteor.methods({
@@ -53,7 +53,7 @@ Meteor.methods({
 		const reportedUser = Users.findOneByUsername(data.username);
 		const admins = Users.findUsersInRoles(['admin']).fetch();
 
-		const match = TandemUserMatches.findByUserIdAndRoomId(Meteor.userId(), data.rid);
+		const match = TandemUsersMatches.findByUserIdAndRoomId(Meteor.userId(), data.rid);
 
 		if (!match){
 			throw new Meteor.Error('error-invalid-match', 'Invalid match', {
@@ -62,7 +62,7 @@ Meteor.methods({
 		}
 
 		if (!match.reportedUsers){
-			TandemUserMatches.reportUserInMatch(Meteor.userId(), match._id, reportedUser._id);
+			TandemUsersMatches.reportUserInMatch(Meteor.userId(), match._id, reportedUser._id);
 		}
 
 		else if (Array.isArray(match.reportedUsers)){
@@ -74,7 +74,7 @@ Meteor.methods({
 				}
 			});
 
-			TandemUserMatches.reportUserInMatch(Meteor.userId(), match._id, reportedUser._id);
+			TandemUsersMatches.reportUserInMatch(Meteor.userId(), match._id, reportedUser._id);
 		}
 
 		admins.map(function (admin) {

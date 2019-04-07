@@ -49,23 +49,25 @@ function SimpleList(props) {
                 {Meteor.user().name}
             </h3>
             <Divider className={classes.divider} />
+            { props.showListMatchesLink &&
             <List component="nav">
                 <h3 className={"rooms-list__type " + classes.no_padding_bottom}>
-                    <ListItemLink href="/languagePreferences" className={"sidebar-item tandem-link"} >
+                    <ListItemLink href="/listMatches" className={"sidebar-item tandem-link"}>
                         <ListItemIcon>
-                            <ListIcon/>
+                            <AssignmentIndIcon/>
                         </ListItemIcon>
-                        <ListItemText primary={t('Preferences')}/>
+                        <ListItemText primary={t('My_matches')}/>
                     </ListItemLink>
                 </h3>
             </List>
+            }
             <List component="nav">
                 <h3 className={"rooms-list__type " + classes.no_padding_bottom}>
                     <ListItemLink href="/languageMatches" className={"sidebar-item tandem-link"}>
                         <ListItemIcon>
                             <PeopleIcon/>
                         </ListItemIcon>
-                        <ListItemText primary={t('Matches')}/>
+                        <ListItemText primary={t('Matchmaking')}/>
                     </ListItemLink>
                 </h3>
             </List>
@@ -79,18 +81,16 @@ function SimpleList(props) {
                     </ListItemLink>
                 </h3>
             </List>
-            { props.showListMatchesLink &&
-                <List component="nav">
-                    <h3 className={"rooms-list__type " + classes.no_padding_bottom}>
-                        <ListItemLink href="/listMatches" className={"sidebar-item tandem-link"}>
-                            <ListItemIcon>
-                                <AssignmentIndIcon/>
-                            </ListItemIcon>
-                            <ListItemText primary={t('My_matches')}/>
-                        </ListItemLink>
-                    </h3>
-                </List>
-            }
+            <List component="nav">
+                <h3 className={"rooms-list__type " + classes.no_padding_bottom}>
+                    <ListItemLink href="/languagePreferences" className={"sidebar-item tandem-link"} >
+                        <ListItemIcon>
+                            <ListIcon/>
+                        </ListItemIcon>
+                        <ListItemText primary={t('Preferences')}/>
+                    </ListItemLink>
+                </h3>
+            </List>
             <Divider/>
         </div>
     );

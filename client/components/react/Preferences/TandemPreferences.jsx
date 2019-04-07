@@ -16,6 +16,7 @@ import TeachLanguagesInput from './TandemTeachLanguagesInput';
 import AvatarInput from './TandemAvatarInput';
 import InfoIcon from '@material-ui/icons/Info';
 import IconButton from '@material-ui/core/IconButton';
+import Link from '@material-ui/core/Link';
 import Tooltip from '@material-ui/core/Tooltip';
 import Typography from '@material-ui/core/Typography';
 
@@ -51,7 +52,7 @@ const styles = {
     },
     title: {
         textAlign: 'center',
-        padding: 10,
+        padding: 15,
     },
     note: {
         textAlign: 'center',
@@ -201,7 +202,7 @@ class TandemPreferences extends React.Component {
     editAccountHandler = () => {
         SideNav.setFlex('accountFlex');
         SideNav.openFlex();
-        FlowRouter.go('account');
+        FlowRouter.redirect('/account/profile');
     }
 
     //handle when select value from drop down box
@@ -374,6 +375,13 @@ class TandemPreferences extends React.Component {
                             }
 
                         </div>
+                        <div>
+                            <Typography variant="h6" >
+                                <Link href={"mailto:google.sk"}>
+                                    {t("preference_missing_language")}
+                                </Link>
+                            </Typography>
+                        </div>
                         <PreferenceActionButtons
                             type={this.state.type}
                             step={this.state.step}
@@ -432,6 +440,13 @@ class TandemPreferences extends React.Component {
                                 />
                             }
                         </div>
+                        <div>
+                            <Typography variant="h6" >
+                                <Link href={"mailto:google.sk"}>
+                                    {t("preference_missing_language")}
+                                </Link>
+                            </Typography>
+                        </div>
                         <PreferenceActionButtons
                             type={this.state.type}
                             step={this.state.step}
@@ -455,7 +470,7 @@ class TandemPreferences extends React.Component {
             case preferenceStepType.avatar: {
                 page = (
                     <div>
-                        <Typography className={classes.title} variant="h3" >
+                        <Typography className={classes.title} variant="h5" >
                             {t("preference_avatar_input_header")}
                         </Typography>
                         <AvatarInput onChange={this.avatarPicked} />

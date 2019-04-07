@@ -2,9 +2,7 @@ import {Template} from 'meteor/templating';
 import {settings} from 'meteor/rocketchat:settings';
 import './tandemSidebar.html';
 import { Session } from 'meteor/session';
-import SimpleList from './react/SideBar/SideBar';
 import {Meteor} from "meteor/meteor";
-import TandemMatches from "./react/MatchMaking/TandemMatches";
 import { menu } from 'meteor/rocketchat:ui-utils';
 import { t } from 'meteor/rocketchat:utils';
 import { hasRole } from 'meteor/rocketchat:authorization';
@@ -20,7 +18,7 @@ Template.tandemMatchingRequest.onCreated(function () {
 
 	// 2. Autorun
 	instance.autorun(function () {
-		Meteor.call('tandemUserMatches/getMatchingRequest', Session.get('openedRoom') , function(error, results) {
+		Meteor.call('tandemUserMatches/getMatchingRequest', instance.data.roomId , function(error, results) {
 			if (error) {
 				toastr.error(t("error-receiving-request"), error);
 			}
@@ -59,7 +57,7 @@ Template.tandemMatchingRequest.helpers({
 
 	showMatchingRequest() {
 		const match = Template.instance().userMatch.get();
-		return match.teacherId === Meteor.userId() && match.status === MatchingRequestStateEnum.PENDING && !Template.instance().requestDone.get();
+		return match.requestedBy !== Meteor.userId() && match.status === MatchingRequestStateEnum.PENDING && !Template.instance().requestDone.get();
 	},
 
 	Match(){
@@ -67,12 +65,12 @@ Template.tandemMatchingRequest.helpers({
 	},
 
 	isStudent(){
-		return Template.instance().userMatch.get().studentId === Meteor.userId();
+		return Template.instance().userMatch.get().requestedBy === Meteor.userId();
 	},
 
 	showFlash(){
 		const match = Template.instance().userMatch.get();
-		return (match.status === MatchingRequestStateEnum.DECLINED || match.status === MatchingRequestStateEnum.PENDING || match.status === MatchingRequestStateEnum.COMPLETED) && match.studentId === Meteor.userId();
+		return (match.status === MatchingRequestStateEnum.DECLINED || match.status === MatchingRequestStateEnum.PENDING || match.status === MatchingRequestStateEnum.COMPLETED) && match.requestedBy === Meteor.userId();
 	},
 
 	getAcceptText() {

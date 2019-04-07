@@ -2,8 +2,9 @@ import { Meteor } from 'meteor/meteor';
 import { check } from 'meteor/check';
 import { hasPermission } from 'meteor/rocketchat:authorization';
 import { Roles } from 'meteor/rocketchat:models';
-import TandemUserMatches from '../models/TandemUsersMatches'
+import TandemUsersMatches from '../models/TandemUsersMatches'
 import TandemLanguageMatches from '../models/TandemLanguageMatches'
+import {MatchingRequestStateEnum} from "../../lib/helperData";
 
 Meteor.methods({
 	unmatchRoom(rid) {
@@ -20,7 +21,7 @@ Meteor.methods({
 			});
 		}
 
-		const match = TandemUserMatches.findByUserIdAndRoomId(Meteor.userId(), rid);
+		const match = TandemUsersMatches.findByUserIdAndRoomId(Meteor.userId(), rid);
 
 		if (!match){
 			throw new Meteor.Error('error-invalid-user', 'Invalid user', {
@@ -29,30 +30,33 @@ Meteor.methods({
 		}
 
 		TandemLanguageMatches.hideMatch(match.languageMatch);
+		TandemUsersMatches.unmatchMatch(match._id, true);
 
-		TandemUserMatches.unmatchMatch(match._id, true);
+		const usersMatches = TandemUsersMatches.findMatches({
+			users: Meteor.userId(),
+			unmatched: false,
+			state: {$in : [MatchingRequestStateEnum.PENDING, MatchingRequestStateEnum.ACCEPTED, MatchingRequestStateEnum.COMPLETED]}
+		});
+		let userStillTeaches = false;
+		let userStillLearns = false;
 
-		const optionsS = {
-			unmatched : false,
-			studentId : Meteor.userId(),
-		};
-		const matchesAsStudent = TandemUserMatches.findWithOptions(optionsS);
+		usersMatches.forEach(function (userMatch) {
+			if (userMatch.matchingLanguage.matchingLanguageTeacherId === Meteor.userId()){
+				userStillTeaches = true;
+			}
+			if (userMatch.symetricLanguage.symetricLanguageTeacherId === Meteor.userId()){
+				userStillLearns = true;
+			}
+		});
 
-		const optionsT = {
-			unmatched : false,
-			teacherId : Meteor.userId(),
-		};
-
-		const matchesAsTeacher = TandemUserMatches.findWithOptions(optionsT);
-
-		if (!matchesAsStudent.count() === 0){
+		if (!userStillLearns){
 			Roles.removeUserRoles(Meteor.userId(), ['tandem-student']);
 		}
-
-		if (!matchesAsTeacher.count() === 0) {
+		if (!userStillTeaches) {
 			Roles.removeUserRoles(Meteor.userId(), ['tandem-teacher']);
 		}
 
+		Meteor.call('executeLanguageMatching', this.userId, []);
 		return true;
 	},
 });

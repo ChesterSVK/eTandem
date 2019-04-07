@@ -6,6 +6,7 @@ import TandemLanguages from './models/TandemLanguages';
 Meteor.startup(function () {
 
 	// Developer note - language name must not contain spaces and brackets otherwise rooms and room requests cannot be created
+	// 	if it does, special characters in room name must be allowed in the administration
 	const languages = [
 		{_id: "tdl_albanian", code: "alb", name: "Albanian"},
 		{_id: "tdl_arabic", code: "ara", name: "Arabic"},
@@ -111,19 +112,4 @@ Meteor.startup(function () {
 		}
 	}
 
-
-	const languageLevels = [
-		{_id: "tdll_a1", level: "A1"},
-		{_id: "tdll_a2", level: "A2"},
-		{_id: "tdll_b1", level: "B1"},
-		{_id: "tdll_b2", level: "B2"},
-		{_id: "tdll_c1", level: "C1"},
-		{_id: "tdll_c2", level: "C2"},
-	];
-
-	for (const languageLevel of languageLevels) {
-		if (!TandemLanguageLevels.findOneById(languageLevel._id)) {
-			TandemLanguageLevels.upsert(languageLevel._id, {$set: languageLevel});
-		}
-	}
 });

@@ -1,11 +1,9 @@
+import { Template } from 'meteor/templating';
 import TandemPreferences from '../components/react/Preferences/TandemPreferences';
 import TandemLanguages from '../models/TandemLanguages'
-import TandemLanguageLevels from '../models/TandemLanguageLevels'
 import TandemUserLanguages from '../models/TandemUserLanguages'
-import { TeachingMotivationEnum  } from '../../lib/helperData'
+import {LanguageLevelsEnum, TeachingMotivationEnum} from '../../lib/helperData'
 import { t } from 'meteor/rocketchat:utils';
-import s from "underscore.string";
-
 
 Template.tandemLanguagePreferences.onCreated(function () {
 	// 1. Instance
@@ -28,7 +26,7 @@ Template.tandemLanguagePreferences.onCreated(function () {
 		}
 		// if subscription is ready, init structures
 		if (subscriptionLevels.ready()) {
-			instance.languageLevels.set(TandemLanguageLevels.find({}).fetch());
+			instance.languageLevels.set(LanguageLevelsEnum.getAsArray()).fetch();
 		}
 
 		// if subscription is ready, init structures
@@ -61,9 +59,6 @@ Template.tandemLanguagePreferences.helpers({
 	getTandemLanguageLevels(){
 		return Template.instance().languageLevels.get();
 	},
-	// TandemHeader() {
-	// 	return TandemHeader;
-	// },
 	TandemPreferences() {
 		return TandemPreferences;
 	}
