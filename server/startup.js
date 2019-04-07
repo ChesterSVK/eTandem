@@ -1,6 +1,5 @@
 /* eslint no-multi-spaces: 0 */
 import {Meteor} from 'meteor/meteor';
-import TandemLanguageLevels from './models/TandemLanguageLevels';
 import TandemLanguages from './models/TandemLanguages';
 
 Meteor.startup(function () {
