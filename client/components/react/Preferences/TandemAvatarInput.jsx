@@ -1,65 +1,52 @@
-import React, { Component } from 'react';
+import React, {Component} from 'react';
 import PropTypes from 'prop-types';
-import { withStyles } from '@material-ui/core/styles';
-import IconButton from '@material-ui/core/IconButton';
-import PhotoCamera from '@material-ui/icons/PhotoCamera';
+import Link from '@material-ui/core/Link';
+import Typography from '@material-ui/core/Typography';
+import {withStyles} from '@material-ui/core/styles';
+import { t } from 'meteor/rocketchat:utils';
 
 const styles = theme => ({
     input: {
         display: 'none',
     },
     button: {
-        display: 'block',
         marginLeft: 'auto',
         marginRight: 'auto',
-        width: 50,
-        height: 50
     },
-    image: {
-        display: 'block',
-        marginLeft: 'auto',
-        marginRight: 'auto',
-        width: 200,
-        height: 200
-    },
+    buttonParent: {
+        padding: "4em 0",
+        textAlign: "center"
+    }
 });
-
 
 
 class AvatarInput extends React.Component {
     state = {
-        file : ''
+        file: ''
     }
 
     handleChange = (event) => {
         const url = URL.createObjectURL(event.target.files[0]);
         this.setState({
             file: url
-        })
+        });
 
         this.props.onChange(url);
     }
 
     render() {
-        const { classes } = this.props;
+        const {classes} = this.props;
         return (
             <div>
-                    {/* <IconButton color="primary"
-                    className={classes.button}
-                    component="span"
-                    href="http://suikero.tech:3000/account/profile"
-                    target="_blank">
-                        <PhotoCamera />
-                    </IconButton>     */}
-
-
-                    <IconButton className={classes.button}
-                    color="primary"
-                    size="big"
-                    href="/account/profile"
-                                    target="_blank">
-                                    <PhotoCamera />
-                                </IconButton>
+                <Typography className={classes.buttonParent} variant="h4">
+                    <Link className={classes.button}
+                          color="primary"
+                          size="big"
+                          href="/account/profile"
+                          target="_blank">
+                        {t("preferences_user")}
+                    </Link>
+                </Typography>
             </div>
         );
     }

@@ -9,6 +9,7 @@ import './methods/executeLanguageMatching';
 import './methods/reloadLanguageMatching';
 // Publications
 import './publications/tandemUserLanguages';
+import './publications/tandemLanguages';
 // Models
 import TandemUserLanguages from './models/TandemUserLanguages';
 import TandemUserMatches from './models/TandemUsersMatches';

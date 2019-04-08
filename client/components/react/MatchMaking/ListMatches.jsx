@@ -73,7 +73,7 @@ const styles = theme => ({
     },
     yourStudentsTitle: {
         paddingLeft: 15,
-        marginBottom : 15
+        marginBottom: 15
     },
     emptyTitle: {
         padding: 15,
@@ -96,9 +96,6 @@ class ListMatches extends React.Component {
         userMatches: []
     }
 
-    componentDidMount() {
-    }
-
     componentWillReceiveProps(nextProps) {
         const matches = nextProps.matches;
         Meteor.call('tandemUserMatches/transform', matches, (error, result) => {
@@ -116,16 +113,47 @@ class ListMatches extends React.Component {
     }
 
     goToRoom(roomName) {
-        return FlowRouter.go('group', { name: roomName }, FlowRouter.current().queryParams);
+        return FlowRouter.go('group', {name: roomName}, FlowRouter.current().queryParams);
     }
 
-    getOtherUserUsername(tileData){
-        if (tileData.symetricLanguageTeacher._id === Meteor.userId()){
-            return tileData.matchingLanguageTeacher.username;
-        }
-        else {
-            return tileData.symetricLanguageTeacher.username;
-        }
+    getOtherUserUsername(tileData) {
+        return tileData.symetricLanguageTeacher._id === Meteor.userId() ?
+            tileData.matchingLanguageTeacher.username
+            :
+            tileData.symetricLanguageTeacher.username;
+    }
+
+    getPending(matches) {
+        return this.getGeneralRender(matches, t("My_Pending"));
+    }
+
+    getDeclined(matches) {
+        return this.getGeneralRender(matches, t("My_Declined"));
+    }
+
+    getCompleted(matches) {
+        return this.getGeneralRender(matches, t("My_Completed"));
+    }
+
+    getAccepted(matches) {
+        return this.getGeneralRender(matches, t("My_students"));
+    }
+
+    getGeneralRender(matches, title) {
+        return matches.length !== 0 ?
+            (<div className={this.classes.yourStudentsTitle}>
+                <Typography variant="overline">{title}</Typography>
+                {matches.map((tile, index) => (
+                    <div className={this.classes.listOfLanguageFriends}
+                         key={tile.matchingLanguage + '_' + tile.symetricLanguage}>
+                        <Card className={this.classes.cardAccepted}>
+                            {
+                                this.getTileData(tile)
+                            }
+                        </Card>
+                    </div>
+                ))}
+            </div>) : ""
     }
 
     getTileData(tile) {
@@ -152,92 +180,24 @@ class ListMatches extends React.Component {
         </div>)
     }
 
-    getPending(matches) {
-        if (matches.length === 0) {
-            return (
-                <div className={this.classes.emptyTitle}>
-                    <Typography variant="h5">{t("No_Pending_Matches")}</Typography>
-                </div>
-            );
-        }
-        else {
-            return (
-                <div className={this.classes.yourStudentsTitle}>
-                    <Typography variant="overline">{t("My_Pending")}</Typography>
-                    {matches.map((tile, index) => (
-                        <div className={this.classes.listOfLanguageFriends} key={tile.matchingLanguage + '_' + tile.symetricLanguage}>
-                            <Card className={this.classes.cardPending}>
-                                {
-                                    this.getTileData(tile)
-                                }
-                            </Card>
-                        </div>
-                    ))}
-                </div>
-
-            );
-        }
-    }
-
-    getCompleted(matches) {
-        if (matches.length === 0) {
-            return (
-                <div className={this.classes.emptyTitle}>
-                    <Typography variant="h5">{t("No_Completed_Matches")}</Typography>
-                </div>
-            );
-        }
-        else {
-            return (
-                <div className={this.classes.yourStudentsTitle}>
-                    <Typography variant="overline">{t("My_Completed")}</Typography>
-                    {matches.map((tile, index) => (
-                        <div className={this.classes.listOfLanguageFriends} key={tile.matchingLanguage + '_' + tile.symetricLanguage}>
-                            <Card className={this.classes.cardCompleted}>
-                                {
-                                    this.getTileData(tile)
-                                }
-                            </Card>
-                        </div>
-                    ))}
-                </div>);
-        }
-    }
-
-    getAccepted(matches) {
-        if (matches.length === 0) {
-            return (
-                <div className={this.classes.emptyTitle}>
-                    <Typography variant="h5">{t("No_Learning_Matches")}</Typography>
-                </div>
-            );
-        }
-        else {
-            return (
-                <div className={this.classes.yourStudentsTitle}>
-                    <Typography variant="overline">{t("My_Students")}</Typography>
-                    {matches.map((tile, index) => (
-                        <div className={this.classes.listOfLanguageFriends} key={tile.matchingLanguage + '_' + tile.symetricLanguage}>
-                            <Card className={this.classes.cardAccepted}>
-                                {
-                                    this.getTileData(tile)
-                                }
-                            </Card>
-                        </div>
-                    ))}
-                </div>
-            );
-        }
-    }
-
     render() {
         return (
             <div>
-                {this.getAccepted(this.state.userMatches.filter(match => match.status === MatchingRequestStateEnum.ACCEPTED))}
+                {this.getAccepted(
+                    this.state.userMatches.filter(match => match.status === MatchingRequestStateEnum.ACCEPTED))
+                }
                 <Divider/>
-                {this.getCompleted(this.state.userMatches.filter(match => match.status === MatchingRequestStateEnum.COMPLETED))}
+                {this.getCompleted(
+                    this.state.userMatches.filter(match => match.status === MatchingRequestStateEnum.COMPLETED))
+                }
                 <Divider/>
-                {this.getPending(this.state.userMatches.filter(match => match.status === MatchingRequestStateEnum.PENDING))}
+                {this.getPending(
+                    this.state.userMatches.filter(match => match.status === MatchingRequestStateEnum.PENDING))
+                }
+                <Divider/>
+                {this.getDeclined(
+                    this.state.userMatches.filter(match => match.status === MatchingRequestStateEnum.DECLINED))
+                }
             </div>
         )
     }

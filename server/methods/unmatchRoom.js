@@ -22,7 +22,6 @@ Meteor.methods({
 		}
 
 		const match = TandemUsersMatches.findByUserIdAndRoomId(Meteor.userId(), rid);
-
 		if (!match){
 			throw new Meteor.Error('error-invalid-user', 'Invalid user', {
 				method: 'unmatchRoom',
@@ -37,6 +36,7 @@ Meteor.methods({
 			unmatched: false,
 			state: {$in : [MatchingRequestStateEnum.PENDING, MatchingRequestStateEnum.ACCEPTED, MatchingRequestStateEnum.COMPLETED]}
 		});
+
 		let userStillTeaches = false;
 		let userStillLearns = false;
 

@@ -2,14 +2,14 @@ import { Template } from 'meteor/templating';
 import TandemPreferences from '../components/react/Preferences/TandemPreferences';
 import TandemLanguages from '../models/TandemLanguages'
 import TandemUserLanguages from '../models/TandemUserLanguages'
-import {LanguageLevelsEnum, TeachingMotivationEnum} from '../../lib/helperData'
+import {TeachingMotivationEnum, getLevelsAsArray} from '../../lib/helperData'
 import { t } from 'meteor/rocketchat:utils';
 
 Template.tandemLanguagePreferences.onCreated(function () {
 	// 1. Instance
 	const instance = this;
 	this.languages = new ReactiveVar([]);
-	this.languageLevels = new ReactiveVar([]);
+	this.languageLevels = getLevelsAsArray();
 	this.teachingLanguages = new ReactiveVar([]);
 	this.learningLanguages = new ReactiveVar([]);
 
@@ -17,16 +17,11 @@ Template.tandemLanguagePreferences.onCreated(function () {
 	instance.autorun(function () {
 		// subscribe to the posts publication
 		let subscriptionLanguages = instance.subscribe('tandemLanguages');
-		let subscriptionLevels = instance.subscribe('tandemLanguageLevels');
 		let subscriptionUserLanguages = instance.subscribe('tandemUserLanguages');
 
 		// if subscription is ready, init structures
 		if (subscriptionLanguages.ready()) {
 			instance.languages.set(TandemLanguages.find({}).fetch());
-		}
-		// if subscription is ready, init structures
-		if (subscriptionLevels.ready()) {
-			instance.languageLevels.set(LanguageLevelsEnum.getAsArray()).fetch();
 		}
 
 		// if subscription is ready, init structures

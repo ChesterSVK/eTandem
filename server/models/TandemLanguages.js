@@ -4,9 +4,7 @@ export class TandemLanguages extends Base {
 	constructor() {
 		super('tandem_languages');
 
-		this.model.before.insert((userId, doc) => {
-
-		});
+		this.model.before.insert((userId, doc) => {});
 
 		this.tryEnsureIndex({
 			langCode: 1,
@@ -31,13 +29,7 @@ export class TandemLanguages extends Base {
 		});
 	}
 
-	findOneByLangCode(langCode) {
-		return this.findOne({code: langCode});
-	}
-
-	findOneByLangCodeAndName(langCode, langName) {
-		return this.findOne({code:langCode, name: langName});
-	}
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////	Find
 
 	findOneByLangName(langName) {
 		return this.findOne({name: langName});

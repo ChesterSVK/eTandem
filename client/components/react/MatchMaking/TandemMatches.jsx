@@ -144,7 +144,6 @@ class TandemMatches extends React.Component {
     render() {
         const {classes} = this.props;
 
-
         return (
             <div className={classes.root}>
                 <List component="nav" className={classes.fullWidth}>

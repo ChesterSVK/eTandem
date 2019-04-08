@@ -20,6 +20,7 @@ export class TandemUsersMatches extends Base {
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////	Insert
+
 	createUserMatchByLanguageMatch(userId, languageMatch, roomId, matchingLangId, symetricLangId){
 		return this.insert({
 			requestedBy: userId,
@@ -37,6 +38,7 @@ export class TandemUsersMatches extends Base {
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////	Find
+
 	findByUserId(userId) {
 		const query = {
 			users : userId,
@@ -65,6 +67,7 @@ export class TandemUsersMatches extends Base {
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////	Custom
+
 	reportUserInMatch(fromUserId, matchId, reportedUserId) {
 		return this.update({_id: matchId}, {
 			$push : {

@@ -1,11 +1,11 @@
 import {Meteor} from 'meteor/meteor';
 import {settings} from 'meteor/rocketchat:settings';
 import {getUserPreference} from 'meteor/rocketchat:utils';
-import { FlowRouter } from 'meteor/kadira:flow-router';
-import { AutoComplete } from 'meteor/mizzao:autocomplete';
-import { callbacks } from 'meteor/rocketchat:callbacks';
-import { t, roomTypes } from 'meteor/rocketchat:utils';
-import { hasAllPermission } from 'meteor/rocketchat:authorization';
+import {FlowRouter} from 'meteor/kadira:flow-router';
+import {AutoComplete} from 'meteor/mizzao:autocomplete';
+import {callbacks} from 'meteor/rocketchat:callbacks';
+import {t, roomTypes} from 'meteor/rocketchat:utils';
+import {hasAllPermission} from 'meteor/rocketchat:authorization';
 import toastr from "toastr";
 
 import React from 'react';
@@ -25,46 +25,46 @@ import CardContent from '@material-ui/core/CardContent';
 import CardActionArea from '@material-ui/core/CardActionArea';
 
 const styles = ({
-  dialogRoot: {},
-  dialogContent: {
-      padding: 0,
-  },
-  avatarHolder: {
-      maxWidth: "320px",
-      margin: "auto",
-  },
-  dialogUserName: {
-      textAlign: "center",
-      padding: "0.3em 1.3em",
-  },
-  listItem: {
-      paddingTop: 16,
-      paddingBottom: 16,
-      paddingLeft: "2em",
-      paddingRight: "2em",
-      minWidth: 300
-  },
-  card: {
-    maxWidth: 336,
-    minWidth: 168,
-    minHeight: 288,
-    maxHeight: 576,
-    margin: 5
-  },
-  media: {
-    minHeight: 168,
-  },
-  h6: {
-    fontSize: 16,
-  },
-  subh: {
-    fontSize: 13,
-  }
+    dialogRoot: {},
+    dialogContent: {
+        padding: 0,
+    },
+    avatarHolder: {
+        maxWidth: "320px",
+        margin: "auto",
+    },
+    dialogUserName: {
+        textAlign: "center",
+        padding: "0.3em 1.3em",
+    },
+    listItem: {
+        paddingTop: 16,
+        paddingBottom: 16,
+        paddingLeft: "2em",
+        paddingRight: "2em",
+        minWidth: 300
+    },
+    card: {
+        maxWidth: 336,
+        minWidth: 168,
+        minHeight: 288,
+        maxHeight: 576,
+        margin: 5
+    },
+    media: {
+        minHeight: 168,
+    },
+    h6: {
+        fontSize: 16,
+    },
+    subh: {
+        fontSize: 13,
+    }
 });
 
 
 function getSymetricLanguage(matchingLangs, matchingLang) {
-    if (matchingLangs.length === 1){
+    if (matchingLangs.length === 1) {
         return t('symetric_language_undefied');
     }
     return matchingLangs[0] === matchingLang ? matchingLangs[1] : matchingLangs[0];
@@ -78,27 +78,32 @@ function createChannel(match) {
     const readOnly = false;
 
 
-    Meteor.call('createPrivateGroup', name, users, readOnly, {}, {topic : t("tandem_room_topic",{ lang1: matchingLanguage, lang2: symetricLanguage })}, function(err, result) {
+    Meteor.call('createPrivateGroup', name, users, readOnly, {}, {
+        topic: t("tandem_room_topic", {
+            lang1: matchingLanguage,
+            lang2: symetricLanguage
+        })
+    }, function (err, result) {
         if (err) {
             if (err.error === 'error-invalid-name') {
                 toastr.error(t("error-invalid-name"), t("error-invalid-name"));
             }
             if (err.error === 'error-invalid-room-name') {
-                toastr.error(t("error-invalid-room-name",{ room_name: name }), t("error-invalid-room-name", { room_name: name }));
+                toastr.error(t("error-invalid-room-name", {room_name: name}), t("error-invalid-room-name", {room_name: name}));
             }
             if (err.error === 'error-duplicate-channel-name') {
-                toastr.error(t("error-duplicate-channel-name", { channel_name: name }), t("error-duplicate-channel-name", { channel_name: name }));
+                toastr.error(t("error-duplicate-channel-name", {channel_name: name}), t("error-duplicate-channel-name", {channel_name: name}));
             }
             console.log(err);
         }
         else {
             Meteor.call('tandemUserMatches/createMatchingRequest', match, result.rid, (error1, result1) => {
-                if (error1){
+                if (error1) {
                     toastr.error(t("error-creating-user-match"));
                 }
                 else {
                     toastr.success(t("success-creating-user-match"));
-                    return FlowRouter.go('group', { name: result1.name }, FlowRouter.current().queryParams);
+                    return FlowRouter.go('group', {name: result1.name}, FlowRouter.current().queryParams);
                 }
             });
         }
@@ -116,7 +121,7 @@ class MatchProfileModal extends React.Component {
     };
 
     handleClose = () => {
-      this.setState({open: false});
+        this.setState({open: false});
     };
 
     handleRequest = (match) => {
@@ -131,80 +136,94 @@ class MatchProfileModal extends React.Component {
         if (langs[1] === lang) return langs[0];
     };
 
+    getCardData(props, classes) {
+        return (
+            <CardActionArea
+                onClick={this.handleClickOpen}>
+                <Blaze template="avatar"
+                       username={props.match.teacher.username}/>
+                <CardContent>
+                    <Typography className={classes.h6} gutterBottom variant="h6" component="h2">
+                        {props.match.teacher.username}
+                    </Typography>
+                    <Typography className={classes.subh} component="p">
+                        {t("looks_for")} {this.getTeachersLanguage(props.match.languagesInMatch, props.match.matchingLanguage)}
+                    </Typography>
+                </CardContent>
+            </CardActionArea>
+        )
+    }
+
+    getDialogData(state, props, classes) {
+        return (
+            <div>
+                <DialogContent className={classes.dialogContent + '  tandem-dialog-content'}>
+                    <Typography variant="h4"
+                                className={classes.dialogUserName + " sidebar__header-status-bullet--" + props.match.teacher.status}>
+                        {this.props.match.teacher.name}
+                    </Typography>
+                    <div className={classes.avatarHolder}>
+                        <Blaze template="avatar"
+                               username={props.match.teacher.username}/>
+                    </div>
+                    <List component="nav">
+                        <ListItem className={classes.listItem}>
+                            {props.match.teacher.customFields && props.match.teacher.customFields.tandemSentence ?
+                                <div>
+                                    <ListItemText secondary={t("about_me")}/>
+                                    <ListItemText primary={props.match.teacher.customFields.tandemSentence}/>
+                                </div>
+                                : ""}
+                        </ListItem>
+                        <ListItem className={classes.listItem}>
+                            <div>
+                                <ListItemText secondary={t("teaches")}/>
+                                <ListItemText primary={props.match.matchingLanguage}/>
+                            </div>
+                        </ListItem>
+                        <ListItem className={classes.listItem}>
+                            <div>
+                                <ListItemText secondary={t("looks_for")}/>
+                                <ListItemText
+                                    primary={this.getTeachersLanguage(props.match.languagesInMatch, props.match.matchingLanguage)}/>
+                            </div>
+                        </ListItem>
+                    </List>
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={this.handleClose} color="primary">
+                        {t("Back")}
+                    </Button>
+                    <Button onClick={() => this.handleRequest(props.match)} color="primary" autoFocus>
+                        {t("request_conversation")}
+                    </Button>
+                </DialogActions>
+            </div>
+        )
+    }
+
     render() {
         const {classes} = this.props;
 
-
         return (
             <div>
-              <Card className={classes.card}>
-                <CardActionArea
-                  onClick={this.handleClickOpen}>
-                  <Blaze template="avatar"
-                          username={this.props.match.teacher.username}/>
-                  <CardContent>
-                    <Typography className={classes.h6} gutterBottom variant="h6" component="h2">
-                        {this.props.match.teacher.username}
-                    </Typography>
-                    {/*<Typography className={classes.subh} component="p">*/}
-                        {/*University  name here*/}
-                    {/*</Typography>*/}
-                    <Typography className={classes.subh} component="p">
-                        {t("looks_for")} {this.getTeachersLanguage(this.props.match.languagesInMatch, this.props.match.matchingLanguage)}
-                    </Typography>
-                  </CardContent>
-                </CardActionArea>
-              </Card>
-              <Dialog
-                  className={classes.dialogRoot}
-                  open={this.state.open}
-                  onClose={this.handleClose}
-                  aria-labelledby="alert-dialog-title"
-                  aria-describedby="alert-dialog-description"
-              >
-                  <DialogContent className={classes.dialogContent + '  tandem-dialog-content'}>
-                      <Typography variant="h4" className={classes.dialogUserName + " sidebar__header-status-bullet--" + this.props.match.teacher.status}>
-                          {this.props.match.teacher.name}
-                      </Typography>
-                      <div className={classes.avatarHolder}>
-                          <Blaze template="avatar"
-                                  username={this.props.match.teacher.username}/>
-                      </div>
-                      <List component="nav">
-                          <ListItem className={classes.listItem}>
-                              {this.props.match.teacher.customFields && this.props.match.teacher.customFields.tandemSentence ?
-                                  <div>
-                                      <ListItemText secondary={t("about_me")}/>
-                                      <ListItemText primary={this.props.match.teacher.customFields.tandemSentence}/>
-                                  </div>
-                                  : ""}
-                          </ListItem>
-                          <ListItem className={classes.listItem}>
-                              <div>
-                                  <ListItemText secondary={t("teaches")}/>
-                                  <ListItemText primary={this.props.match.matchingLanguage}/>
-                              </div>
-                          </ListItem>
-                          <ListItem className={classes.listItem}>
-                              <div>
-                                  <ListItemText secondary={t("looks_for")}/>
-                                  <ListItemText primary={this.getTeachersLanguage(this.props.match.languagesInMatch, this.props.match.matchingLanguage)} />
-                              </div>
-                          </ListItem>
-                      </List>
-                  </DialogContent>
-                  <DialogActions>
-                      <Button onClick={this.handleClose} color="primary">
-                          {t("Back")}
-                      </Button>
-                      <Button onClick={ () => this.handleRequest(this.props.match)} color="primary" autoFocus>
-                          {t("request_conversation")}
-                      </Button>
-                  </DialogActions>
-              </Dialog>
+                <Card className={classes.card}>
+                    {
+                        this.getCardData(this.props, classes)
+                    }
+                </Card>
+                <Dialog
+                    className={classes.dialogRoot}
+                    open={this.state.open}
+                    onClose={this.handleClose}
+                    aria-labelledby="alert-dialog-title"
+                    aria-describedby="alert-dialog-description">
+                {
+                    this.getDialogData(this.state, this.props, classes)
+                }
+                </Dialog>
             </div>
-        )
-            ;
+        );
     }
 }
 

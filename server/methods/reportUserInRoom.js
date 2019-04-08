@@ -12,7 +12,12 @@ Meteor.methods({
 			username: String,
 		}));
 
-		const reason = data.reason ? check(data.reason, String) : '';
+		if (!data.reason){
+			throw new Meteor.Error('error-invalid-reason', 'Reason not provided', {
+				method: 'reportUserInRoom',
+			});
+		}
+		check(data.reason, String);
 
 		if (!Meteor.userId()) {
 			throw new Meteor.Error('error-invalid-user', 'Invalid user', {
@@ -90,7 +95,6 @@ Meteor.methods({
 				reason,
 			});
 		});
-
 
 		return true;
 	},

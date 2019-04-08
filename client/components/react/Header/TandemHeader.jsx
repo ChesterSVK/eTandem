@@ -65,7 +65,7 @@ function TandemHeader(props) {
 
     return (
         <AppBar position={position}
-                className={classes.root + ' ' + (className ? className : '') }>
+                className={classes.root + ' ' + (className ? className : '')}>
             <Toolbar>
                 {getNavbar()}
                 <Typography variant="h6" color="inherit" className={classes.grow}>

@@ -6,6 +6,8 @@ export class TandemUserLanguages extends Base {
 		this._initModel('tandem_user_languages');
 	}
 
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////	Find
+
 	findLanguagesWithMotivation(motivation) {
 		return this.find({motivation: motivation});
 	}

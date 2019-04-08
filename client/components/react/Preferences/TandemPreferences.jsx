@@ -1,3 +1,4 @@
+import {Meteor} from 'meteor/meteor';
 import React, { Component } from 'react'
 import PropTypes from 'prop-types';
 import { withStyles } from '@material-ui/core/styles';
@@ -7,7 +8,6 @@ import PreferenceItem from './TandemPreferenceItem.jsx';
 import TandemHeader from '../Header/TandemHeader.jsx';
 import TandemLanguages from '../../../models/TandemLanguages';
 import PreferenceActionButtons from './TandemPreferenceActionButtons';
-
 import { t, handleError } from 'meteor/rocketchat:utils';
 import toastr from 'toastr';
 
@@ -258,7 +258,6 @@ class TandemPreferences extends React.Component {
         }
     }
 
-    //click save button
     handleSaveLanguages = () => {
         if (this.state.step === preferenceStepType.teach) {
             $('#tandemLoading').fadeIn();
@@ -274,12 +273,7 @@ class TandemPreferences extends React.Component {
         }
     }
 
-    //handle upload avatar
     handleSaveAvatar = () => {
-        // if (this.state.avatarURL != null) {
-        // }
-        // else {
-        // }
         this.setState(
             {
                 step: preferenceStepType.general,
@@ -470,9 +464,9 @@ class TandemPreferences extends React.Component {
             case preferenceStepType.avatar: {
                 page = (
                     <div>
-                        <Typography className={classes.title} variant="h5" >
-                            {t("preference_avatar_input_header")}
-                        </Typography>
+                        {/*<Typography className={classes.title} variant="h5" >*/}
+                            {/*{t("preference_avatar_input_header")}*/}
+                        {/*</Typography>*/}
                         <AvatarInput onChange={this.avatarPicked} />
                         <PreferenceActionButtons
                             type={this.state.type}
@@ -486,12 +480,8 @@ class TandemPreferences extends React.Component {
                 break;
             }
         }
-
-
         return page;
     }
-
-
 }
 
 TandemPreferences.propTypes = {

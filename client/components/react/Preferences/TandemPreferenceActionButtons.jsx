@@ -10,9 +10,7 @@ const styles = {
         width: 100,
         float: 'right',
         margin: 8,
-
     },
-
     text: {
         float: 'left',
         margin: 8
@@ -51,7 +49,6 @@ class PreferenceActionButtons extends Component {
                 >{t("Back")}
                 </Button>);
             }
-
 
             page = (<div>
                 <Typography className={classes.text} variant="h6">

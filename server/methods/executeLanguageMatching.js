@@ -127,23 +127,23 @@ function createSuitableMatches(userLanguagePreference, languageLevelsObject, new
 }
 
 
-function getUserExistingMatches(userId, languageId) {
-	return TandemUsersMatches.findWithOptions(
-		{
-			$or: [
-				{
-					"matchingLanguage.matchingLanguageId": languageId,
-					"matchingLanguage.matchingLanguageTeacherId": userId
-				},
-				{
-					"symetricLanguage.symetricLanguageId": languageId,
-					"symetricLanguage.symetricLanguageTeacherId": userId
-				},
-			],
-			status: {$in: [MatchingRequestStateEnum.ACCEPTED, MatchingRequestStateEnum.PENDING]},
-			unmatched: false
-		});
-}
+// function getUserExistingMatches(userId, languageId) {
+// 	return TandemUsersMatches.findWithOptions(
+// 		{
+// 			$or: [
+// 				{
+// 					"matchingLanguage.matchingLanguageId": languageId,
+// 					"matchingLanguage.matchingLanguageTeacherId": userId
+// 				},
+// 				{
+// 					"symetricLanguage.symetricLanguageId": languageId,
+// 					"symetricLanguage.symetricLanguageTeacherId": userId
+// 				},
+// 			],
+// 			status: {$in: [MatchingRequestStateEnum.ACCEPTED, MatchingRequestStateEnum.PENDING]},
+// 			unmatched: false
+// 		});
+// }
 
 function getExistingMatchesNotEqualToUser(userId, languageId) {
 	return TandemUsersMatches.findWithOptions(

@@ -1,4 +1,4 @@
-import { Base } from 'meteor/rocketchat:models';
+import {Base} from 'meteor/rocketchat:models';
 
 export class TandemLanguageMatches extends Base {
 	constructor() {
@@ -10,32 +10,41 @@ export class TandemLanguageMatches extends Base {
 
 	}
 
-	createAsymetricMatchAsStudent(studentId, match){
-		return this.insert({symetric : false, usersInMatch: [studentId, match.userId], languagesInMatch: [match.langId]});
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////	Insert
+
+	createSymetricMatchAsStudent(studentId, match, symetricLanguageId) {
+		return this.insert(
+			{
+				symetric: true,
+				usersInMatch: [studentId, match.userId],
+				languagesInMatch: [match.langId, symetricLanguageId]
+			});
 	}
 
-	createAsymetricMatchAsTeacher(teacherId, match){
-		return this.insert({symetric : false, usersInMatch: [teacherId, match.userId], languagesInMatch: [match.langId]});
+	createSymetricMatchAsTeacher(teacherId, match, symetricLanguageId) {
+		return this.insert({
+			symetric: true,
+			usersInMatch: [teacherId, match.userId],
+			languagesInMatch: [match.langId, symetricLanguageId]
+		});
 	}
 
-	createSymetricMatchAsStudent(studentId, match, symetricLanguageId){
- 		return this.insert({symetric : true, usersInMatch: [studentId, match.userId], languagesInMatch: [match.langId, symetricLanguageId]});
-	}
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////	Custom
 
-	createSymetricMatchAsTeacher(teacherId, match, symetricLanguageId){
-		return this.insert({symetric : true,  usersInMatch: [teacherId, match.userId], languagesInMatch: [match.langId, symetricLanguageId]});
-	}
-
-	hideMatch(matchId){
+	hideMatch(matchId) {
 		return this.update({_id: matchId}, {$set: {hidden: true}});
 	}
 
-	findMatches(query){
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////	Find
+
+	findMatches(query) {
 		return this.find(query);
 	}
 
-	removeMatchesWhereUser(userId){
-		return this.remove({usersInMatch : userId});
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////	Delete
+
+	removeMatchesWhereUser(userId) {
+		return this.remove({usersInMatch: userId});
 	}
 }
 

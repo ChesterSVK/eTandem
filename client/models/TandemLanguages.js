@@ -6,6 +6,8 @@ export class TandemLanguages extends Base {
 		this._initModel('tandem_languages');
 	}
 
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////	Find
+
 	findById(langId) {
 		return this.findOne({_id: langId});
 	}

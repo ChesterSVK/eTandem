@@ -12,7 +12,7 @@ import './components/tandemSidebar'
 import './components/tandemMatchingRequest.html'
 import './components/tandemMatchingRequest'
 import './components/loading/tandemLoading.html'
-//LocalModels
+//Models
 import TandemUsersMatches from './models/TandemUsersMatches';
 import TandemUserLanguages from './models/TandemUserLanguages';
 import TandemLanguages from './models/TandemLanguages';

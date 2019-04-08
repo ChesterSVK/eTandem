@@ -31,7 +31,6 @@ function PreferenceItem(props) {
         <Typography variant="subtitle1" color="textSecondary">
           {props.content}
         </Typography>
-
       </CardContent>
       <CardActions>
         <Button size="small" onClick={props.action}>{t("Edit")}</Button>

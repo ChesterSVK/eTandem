@@ -1,4 +1,5 @@
 import {Meteor} from 'meteor/meteor';
+import { t } from 'meteor/rocketchat:utils';
 
 import React from 'react';
 import PropTypes from 'prop-types';
@@ -12,8 +13,6 @@ import ListIcon from '@material-ui/icons/List';
 import SchoolIcon from '@material-ui/icons/School';
 import AssignmentIndIcon from '@material-ui/icons/AssignmentInd';
 import PeopleIcon from '@material-ui/icons/People';
-import { t } from 'meteor/rocketchat:utils';
-
 
 const styles = theme => ({
     root: {
@@ -39,7 +38,7 @@ function ListItemLink(props) {
     return <ListItem button component="a" {...props} />;
 }
 
-// Routes defined in 'client/routes/router.js'
+// Tandem routes defined in 'client/routes/router.js'
 
 function SimpleList(props) {
     const {classes} = props;

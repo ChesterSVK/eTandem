@@ -1,18 +1,17 @@
+import {Meteor} from "meteor/meteor";
 import {Template} from 'meteor/templating';
 import {settings} from 'meteor/rocketchat:settings';
-import './tandemSidebar.html';
 import SimpleList from './react/SideBar/SideBar';
-import {Meteor} from "meteor/meteor";
 import { menu } from 'meteor/rocketchat:ui-utils';
 import { handleError } from 'meteor/rocketchat:utils';
-
-
+import './tandemSidebar.html';
 
 Template.tandemSidebar.onCreated(function () {
-// 1. Instance
+	// 1. Instance
 	const instance = this;
+	// 2. Variables
 	this.hasUserMatches = new ReactiveVar(false);
-	// 2. Autorun
+	// 3. Autorun
 	instance.autorun(function () {
 		Meteor.call('hasUserMatches', function (error, results) {
 			if (error) {
@@ -20,7 +19,6 @@ Template.tandemSidebar.onCreated(function () {
 			}
 
 			instance.hasUserMatches.set(results);
-			return results;
 		});
 	});
 })

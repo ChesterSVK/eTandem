@@ -9,7 +9,6 @@ import {MatchingRequestStateEnum} from "../../lib/helperData";
 
 
 function getSymetricLang(langs, matchingLang){
-	console.log(langs);
 	if (langs.length === 2){
 		if (langs[0] === matchingLang){
 			return langs[1];
@@ -86,16 +85,28 @@ Meteor.methods({
 
 	'tandemUserMatches/createMatchingRequest'(match, roomId) {
 		if (!this.userId) {
-			throw new Meteor.Error('error-invalid-user', 'Invalid user', {method: 'tandemUserMatches/createMatchingRequest'});
+			throw new Meteor.Error(
+				'error-invalid-user', 'Invalid user', {method: 'tandemUserMatches/createMatchingRequest'});
 		}
 		if (match === undefined || typeof match !== 'object') {
-			throw new Meteor.Error('error-invalid-match', 'Invalid match', {method: 'tandemUserMatches/createMatchingRequest'});
+			throw new Meteor.Error(
+				'error-invalid-match', 'Invalid match', {method: 'tandemUserMatches/createMatchingRequest'});
 		}
 		if (roomId === undefined) {
-			throw new Meteor.Error('error-invalid-match', 'Invalid match', {method: 'tandemUserMatches/createMatchingRequest'});
+			throw new Meteor.Error(
+				'error-invalid-match', 'Invalid match', {method: 'tandemUserMatches/createMatchingRequest'});
 		}
 
-		Messages.createWithTypeRoomIdMessageAndUser(undefined, roomId, t("get_request_welcome_message", { lang1: match.matchingLanguage, lang2: match.languagesInMatch[0] === match.matchingLanguage ? match.languagesInMatch[1] : match.languagesInMatch[0] }), Meteor.user(), {});
+		Messages.createWithTypeRoomIdMessageAndUser(
+			undefined,
+			roomId,
+			t("get_request_welcome_message",
+				{
+					lang1: match.matchingLanguage,
+					lang2: match.languagesInMatch[0] === match.matchingLanguage ?
+						match.languagesInMatch[1] : match.languagesInMatch[0]
+				}),
+			Meteor.user(), {});
 
 		TandemLanguageMatches.hideMatch(match._id);
 
@@ -111,10 +122,12 @@ Meteor.methods({
 
 	'tandemUserMatches/transform' (matches) {
 		if (!this.userId) {
-			throw new Meteor.Error('error-invalid-user', 'Invalid user', {method: 'tandemUserMatches/createMatchingRequest'});
+			throw new Meteor.Error(
+				'error-invalid-user', 'Invalid user', {method: 'tandemUserMatches/createMatchingRequest'});
 		}
 		if (matches === undefined || !Array.isArray(matches)) {
-			throw new Meteor.Error('error-invalid-match', 'Invalid match', {method: 'tandemUserMatches/createMatchingRequest'});
+			throw new Meteor.Error(
+				'error-invalid-match', 'Invalid match', {method: 'tandemUserMatches/createMatchingRequest'});
 		}
 
 		return matches.map(function (match) {
@@ -130,7 +143,11 @@ Meteor.methods({
 		const query = {
 			users: this.userId,
 			status: {
-				$in: [MatchingRequestStateEnum.ACCEPTED, MatchingRequestStateEnum.COMPLETED, MatchingRequestStateEnum.PENDING]
+				$in: [
+					MatchingRequestStateEnum.ACCEPTED,
+					MatchingRequestStateEnum.COMPLETED,
+					MatchingRequestStateEnum.PENDING
+				]
 			},
 			unmatched: false,
 		};
