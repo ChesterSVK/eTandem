@@ -1,15 +1,16 @@
+import TandemLanguages from '../../../models/TandemLanguages';
+import {LanguageLevelsEnum} from '../../../../lib/helperData';
+import {noLanguage, noLevel} from './TandemLanguageConstant'
 import React from 'react';
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////	Material UI
 import PropTypes from 'prop-types';
-import { withStyles } from '@material-ui/core/styles';
+import {withStyles} from '@material-ui/core/styles';
 import MenuItem from '@material-ui/core/MenuItem';
 import FormControl from '@material-ui/core/FormControl';
 import Select from '@material-ui/core/Select';
 import Paper from '@material-ui/core/Paper';
-import { noLanguage, noLevel } from './TandemLanguageConstant'
-import TandemLanguages from '../../../models/TandemLanguages';
-import {LanguageLevelsEnum} from '../../../../lib/helperData';
 
-
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////	Styles
 
 const styles = theme => ({
     root: {
@@ -67,16 +68,22 @@ const MenuProps = {
     }
 };
 
-function getAllowedLevels(){
-    const levels =  [ Object.keys(LanguageLevelsEnum)[4], Object.keys(LanguageLevelsEnum)[5] ];
-    return levels.map(function (level) { return { _id: LanguageLevelsEnum[level], level: level } });
+function getAllowedLevels() {
+    const levels = [Object.keys(LanguageLevelsEnum)[4], Object.keys(LanguageLevelsEnum)[5]];
+    return levels.map(function (level) {
+        return {_id: LanguageLevelsEnum[level], level: level}
+    });
 }
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////	Class
 
 class TeachLanguagesInput extends React.Component {
     constructor(props) {
         super(props);
 
-        const allLanguages = TandemLanguages.findAll().map(function (language) { return { _id: language._id, name: language.name } });
+        const allLanguages = TandemLanguages.findAll().map(function (language) {
+            return {_id: language._id, name: language.name}
+        });
         this.state.allLanguages = allLanguages;
         const allLevel = getAllowedLevels();
         this.state.allLevel = allLevel;
@@ -114,11 +121,11 @@ class TeachLanguagesInput extends React.Component {
         }
 
         this.setState({
-            pickedLanguage: lang,
-            pickedLevel: lvl,
-            allPickedLanguages: nextProps.pickedLanguages,
-            unavailableLanguages: nextProps.unavailableLanguages
-        }
+                pickedLanguage: lang,
+                pickedLevel: lvl,
+                allPickedLanguages: nextProps.pickedLanguages,
+                unavailableLanguages: nextProps.unavailableLanguages
+            }
             ,
             () => {
                 //        console.log(this.state);
@@ -134,7 +141,7 @@ class TeachLanguagesInput extends React.Component {
     };
 
     handleChangeValue = event => {
-        this.setState({ [event.target.name]: event.target.value },
+        this.setState({[event.target.name]: event.target.value},
             () => {
                 this.props.changeTeachLanguageValue(
                     this.state.pickedLanguage,
@@ -147,41 +154,41 @@ class TeachLanguagesInput extends React.Component {
 
 
     render() {
-        const { classes } = this.props;
+        const {classes} = this.props;
         const allPickedLanguages = this.state.allPickedLanguages;
         const unavailableLanguages = this.state.unavailableLanguages;
 
         const languageMenu = this.state.allLanguages.map((language) => {
-            let disabled = false;
-            if (allPickedLanguages != null) {
-                const a = allPickedLanguages.filter(pickedLanguage => {
-                    return (pickedLanguage.langId == language._id) 
-                });
-                disabled = disabled || (a.length > 0);
+                let disabled = false;
+                if (allPickedLanguages != null) {
+                    const a = allPickedLanguages.filter(pickedLanguage => {
+                        return (pickedLanguage.langId == language._id)
+                    });
+                    disabled = disabled || (a.length > 0);
+                }
+                if (unavailableLanguages != null) {
+                    const a = unavailableLanguages.filter(unavailableLanguage => {
+                        return (unavailableLanguage.langId == language._id)
+                    });
+                    disabled = disabled || (a.length > 0);
+                }
+                return <MenuItem
+                    key={language._id}
+                    value={language}
+                    disabled={disabled}
+                >
+                    {language.name}
+                </MenuItem>
             }
-            if (unavailableLanguages!=null) {
-                const a = unavailableLanguages.filter(unavailableLanguage => {
-                    return (unavailableLanguage.langId == language._id) 
-                });
-                disabled = disabled || (a.length > 0);
-            }
-            return <MenuItem
-                key={language._id}
-                value={language}
-                disabled={disabled}
-            >
-                {language.name}
-            </MenuItem>
-        }
         );
 
         const levelMenu = this.state.allLevel.map((level) => {
-            return <MenuItem
-                key={level._id}
-                value={level}>
-                {level.level}
-            </MenuItem>
-        }
+                return <MenuItem
+                    key={level._id}
+                    value={level}>
+                    {level.level}
+                </MenuItem>
+            }
         );
 
         return (
@@ -234,4 +241,4 @@ TeachLanguagesInput.propTypes = {
     classes: PropTypes.object.isRequired,
 };
 
-export default withStyles(styles, { withTheme: true })(TeachLanguagesInput);
+export default withStyles(styles, {withTheme: true})(TeachLanguagesInput);

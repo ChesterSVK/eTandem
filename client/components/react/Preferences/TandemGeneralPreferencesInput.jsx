@@ -2,8 +2,8 @@ import {Meteor} from 'meteor/meteor';
 import {t, handleError} from 'meteor/rocketchat:utils';
 import {getUserPreference} from 'meteor/rocketchat:utils';
 import toastr from "toastr";
-
 import React from 'react';
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////	Material UI
 import PropTypes from 'prop-types';
 import {withStyles} from '@material-ui/core/styles';
 import List from '@material-ui/core/List';
@@ -20,6 +20,7 @@ import Tooltip from '@material-ui/core/Tooltip';
 import IconButton from '@material-ui/core/IconButton';
 import InfoIcon from '@material-ui/icons/Info';
 
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////	Custom Functions
 const success = function success(fn) {
     return function (error, result) {
         if (error) {
@@ -31,6 +32,7 @@ const success = function success(fn) {
     };
 };
 
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////	Styles
 
 const styles = theme => ({
     root: {
@@ -100,6 +102,8 @@ const styles = theme => ({
         width: '100%',
     },
 });
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////	Class
 
 class TandemGeneralPreferencesInput extends React.Component {
     constructor(props) {

@@ -1,16 +1,18 @@
 import {Meteor} from 'meteor/meteor';
-import React, { Component } from 'react'
+import React, {Component} from 'react'
 import PropTypes from 'prop-types';
-import { withStyles } from '@material-ui/core/styles';
-import { FlowRouter } from 'meteor/kadira:flow-router';
-import { SideNav } from 'meteor/rocketchat:ui-utils';
+import {withStyles} from '@material-ui/core/styles';
+import {FlowRouter} from 'meteor/kadira:flow-router';
+import {SideNav} from 'meteor/rocketchat:ui-utils';
 import PreferenceItem from './TandemPreferenceItem.jsx';
 import TandemHeader from '../Header/TandemHeader.jsx';
 import TandemLanguages from '../../../models/TandemLanguages';
 import PreferenceActionButtons from './TandemPreferenceActionButtons';
-import { t, handleError } from 'meteor/rocketchat:utils';
+import {t, handleError} from 'meteor/rocketchat:utils';
 import toastr from 'toastr';
 
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////	Material UI
 import StudyLanguagesInput from './TandemStudyLanguagesInput';
 import TeachLanguagesInput from './TandemTeachLanguagesInput';
 import AvatarInput from './TandemAvatarInput';
@@ -19,16 +21,17 @@ import IconButton from '@material-ui/core/IconButton';
 import Link from '@material-ui/core/Link';
 import Tooltip from '@material-ui/core/Tooltip';
 import Typography from '@material-ui/core/Typography';
+import Button from '@material-ui/core/Button';
 
-import { themeColor, preferenceConfig } from '../Utilities/Constants'
+import {themeColor, preferenceConfig} from '../Utilities/Constants'
 
-export const preferenceScreenType = { "setting": 1, "firstTime": 2 };
-export const preferenceStepType = { "general": 1, "teach": 2, "study": 3, "generalPreferences": 4, "avatar": 5 };
+export const preferenceScreenType = {"setting": 1, "firstTime": 2};
+export const preferenceStepType = {"general": 1, "teach": 2, "study": 3, "generalPreferences": 4, "avatar": 5};
 
-import { noLanguage, noLevel } from './TandemLanguageConstant'
-import { TeachingMotivationEnum } from "../../../../lib/helperData";
+import {noLanguage, noLevel} from './TandemLanguageConstant'
+import {TeachingMotivationEnum} from "../../../../lib/helperData";
 import TandemGeneralPreferencesInput from "./TandemGeneralPreferencesInput";
-
+import {TandemFeedbackMails} from "../../../../lib/feedbackMails";
 
 const success = function success(fn) {
     return function (error, result) {
@@ -73,6 +76,8 @@ const styles = {
     }
 }
 
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////    Class
+
 class TandemPreferences extends React.Component {
     state = {
         type: preferenceScreenType.setting,
@@ -103,7 +108,7 @@ class TandemPreferences extends React.Component {
         }
         else if (this.state.teachLanguages.length !== 0 &&
             this.state.studyLanguages.length === 0 && studyLanguages.length !== 0) {
-                //After set study language from no language -> show avatar input
+            //After set study language from no language -> show avatar input
             step = preferenceStepType.avatar;
             type = preferenceScreenType.firstTime;
             pickedLanguages = [];
@@ -210,7 +215,7 @@ class TandemPreferences extends React.Component {
         var pickedLanguages = [...this.state.pickedLanguages];
         if (index === pickedLanguages.length) {
             if (language != noLanguage && level != noLevel) {
-                pickedLanguages.push({ language: language, level: level });
+                pickedLanguages.push({language: language, level: level});
                 this.setState({
                     pickedLanguages: pickedLanguages
                 });
@@ -218,7 +223,7 @@ class TandemPreferences extends React.Component {
         }
         if (index < pickedLanguages.length) {
             if (language != noLanguage && level != noLevel) {
-                pickedLanguages[index] = { langId: language._id, levelId: level._id };
+                pickedLanguages[index] = {langId: language._id, levelId: level._id};
                 this.setState({
                     pickedLanguages: pickedLanguages
                 });
@@ -236,7 +241,7 @@ class TandemPreferences extends React.Component {
         var pickedLanguages = [...this.state.pickedLanguages];
         if (index === pickedLanguages.length) {
             if (language != noLanguage && level != noLevel && credit != 0) {
-                pickedLanguages.push({ language: language, level: level, credit: credit });
+                pickedLanguages.push({language: language, level: level, credit: credit});
                 this.setState({
                     pickedLanguages: pickedLanguages
                 });
@@ -244,7 +249,7 @@ class TandemPreferences extends React.Component {
         }
         if (index < pickedLanguages.length) {
             if (language != noLanguage && level != noLevel && credit > 0) {
-                pickedLanguages[index] = { langId: language._id, levelId: level._id, credits: credit };
+                pickedLanguages[index] = {langId: language._id, levelId: level._id, credits: credit};
                 this.setState({
                     pickedLanguages: pickedLanguages
                 });
@@ -261,15 +266,21 @@ class TandemPreferences extends React.Component {
     handleSaveLanguages = () => {
         if (this.state.step === preferenceStepType.teach) {
             $('#tandemLoading').fadeIn();
-            Meteor.call('tandemUserLanguages/setPreferences', this.state.pickedLanguages, TeachingMotivationEnum.WTTEACH, success(() => {
-                toastr.success(t("Message_Saving_Preference"), t("Title_Saving_Preference"));
-            }));
+            Meteor.call('tandemUserLanguages/setPreferences',
+                this.state.pickedLanguages,
+                TeachingMotivationEnum.WTTEACH,
+                success(() => {
+                    toastr.success(t("Message_Saving_Preference"), t("Title_Saving_Preference"));
+                }));
         }
         else if (this.state.step === preferenceStepType.study) {
             $('#tandemLoading').fadeIn();
-            Meteor.call('tandemUserLanguages/setPreferences', this.state.pickedLanguages, TeachingMotivationEnum.WTLEARN, success(() => {
-                toastr.success(t("Message_Saving_Preference"), t("Title_Saving_Preference"));
-            }));
+            Meteor.call('tandemUserLanguages/setPreferences',
+                this.state.pickedLanguages,
+                TeachingMotivationEnum.WTLEARN,
+                success(() => {
+                    toastr.success(t("Message_Saving_Preference"), t("Title_Saving_Preference"));
+                }));
         }
     }
 
@@ -289,30 +300,32 @@ class TandemPreferences extends React.Component {
     }
 
     render() {
-        const { classes } = this.props;
+        const {classes} = this.props;
         let page = null;
 
 
         switch (this.state.step) {
             case preferenceStepType.general: {
-                let teachLanguagesString = this.state.teachLanguages.map((languageData) => TandemLanguages.findById(languageData.langId).name).join(", ");
-                let studyLanguagesString = this.state.studyLanguages.map((languageData) => TandemLanguages.findById(languageData.langId).name).join(", ");
+                let teachLanguagesString = this.state.teachLanguages.map(
+                    (languageData) => TandemLanguages.findById(languageData.langId).name).join(", ");
+                let studyLanguagesString = this.state.studyLanguages.map(
+                    (languageData) => TandemLanguages.findById(languageData.langId).name).join(", ");
 
                 page = (
                     <div>
 
                         <PreferenceItem title={t("I_can_teach")}
-                            content={teachLanguagesString}
-                            action={this.editTeachLanguageHandler} />
+                                        content={teachLanguagesString}
+                                        action={this.editTeachLanguageHandler}/>
                         <PreferenceItem title={t("I_want_to_learn")}
-                            content={studyLanguagesString}
-                            action={this.editStudyLanguageHandler} />
+                                        content={studyLanguagesString}
+                                        action={this.editStudyLanguageHandler}/>
                         <PreferenceItem title={t("Preferences_M")}
-                            content={""}
-                            action={this.editGeneralHandler} />
+                                        content={""}
+                                        action={this.editGeneralHandler}/>
                         <PreferenceItem title={t("Account")}
                                         content={t("Manage_account")}
-                                        action={this.editAccountHandler} />
+                                        action={this.editAccountHandler}/>
                     </div>
                 );
                 break;
@@ -333,7 +346,7 @@ class TandemPreferences extends React.Component {
                 );
 
                 let header = (<TandemHeader title={t("Preferences_T")}
-                    displayArrow={true} backAction={this.backHandler} />);
+                                            displayArrow={true} backAction={this.backHandler}/>);
 
                 if (this.state.type === preferenceScreenType.firstTime) {
                     header = null;
@@ -343,11 +356,11 @@ class TandemPreferences extends React.Component {
                         {header}
                         <div className={classes.infoButtonContainer}>
                             <Tooltip title={t("info_about_language_levels")}
-                                aria-label={t("info_about_language_levels")}>
+                                     aria-label={t("info_about_language_levels")}>
                                 <IconButton className={classes.infoButton} size="big"
-                                    href="https://en.wikipedia.org/wiki/Common_European_Framework_of_Reference_for_Languages#Common_reference_levels"
-                                    target="_blank">
-                                    <InfoIcon fontSize="large" color="secondary" />
+                                            href="https://en.wikipedia.org/wiki/Common_European_Framework_of_Reference_for_Languages#Common_reference_levels"
+                                            target="_blank">
+                                    <InfoIcon fontSize="large" color="secondary"/>
                                 </IconButton>
                             </Tooltip>
                         </div>
@@ -360,20 +373,20 @@ class TandemPreferences extends React.Component {
                             {
                                 this.state.pickedLanguages.length < preferenceConfig.maxTeachLanguage &&
                                 <TeachLanguagesInput index={this.state.pickedLanguages.length}
-                                    changeTeachLanguageValue={this.changeTeachLanguageHandler}
-                                    languageId={0}
-                                    levelId={0}
-                                    pickedLanguages={this.state.pickedLanguages}
-                                    unavailableLanguages={this.state.studyLanguages}
+                                                     changeTeachLanguageValue={this.changeTeachLanguageHandler}
+                                                     languageId={0}
+                                                     levelId={0}
+                                                     pickedLanguages={this.state.pickedLanguages}
+                                                     unavailableLanguages={this.state.studyLanguages}
                                 />
                             }
 
                         </div>
                         <div>
-                            <Typography variant="h6" >
-                                <Link href={"mailto:google.sk"}>
+                            <Typography variant="h6">
+                                <Button className={"tandem-more-languages-button"} variant="contained">
                                     {t("preference_missing_language")}
-                                </Link>
+                                </Button>
                             </Typography>
                         </div>
                         <PreferenceActionButtons
@@ -403,14 +416,14 @@ class TandemPreferences extends React.Component {
 
                 page = (
                     <div>
-                        <TandemHeader title={t("Preferences_L")} displayArrow={true} backAction={this.backHandler} />
+                        <TandemHeader title={t("Preferences_L")} displayArrow={true} backAction={this.backHandler}/>
                         <div className={classes.infoButtonContainer}>
                             <Tooltip title={t("info_about_language_levels")}
-                                aria-label={t("info_about_language_levels")}>
+                                     aria-label={t("info_about_language_levels")}>
                                 <IconButton className={classes.infoButton} size="big"
-                                    href="https://en.wikipedia.org/wiki/Common_European_Framework_of_Reference_for_Languages#Common_reference_levels"
-                                    target="_blank">
-                                    <InfoIcon fontSize="large" color="secondary" />
+                                            href="https://en.wikipedia.org/wiki/Common_European_Framework_of_Reference_for_Languages#Common_reference_levels"
+                                            target="_blank">
+                                    <InfoIcon fontSize="large" color="secondary"/>
                                 </IconButton>
                             </Tooltip>
                         </div>
@@ -424,21 +437,21 @@ class TandemPreferences extends React.Component {
                                 this.state.pickedLanguages.length < preferenceConfig.maxStudyLanguage &&
                                 <
                                     StudyLanguagesInput index={this.state.pickedLanguages.length}
-                                    changeStudyLanguageValue={this.changeStudyLanguageHandler}
-                                    languageId={0}
-                                    levelId={0}
-                                    credit={0}
-                                    pickedLanguages={this.state.pickedLanguages}
-                                    unavailableLanguages={this.state.teachLanguages}
+                                                        changeStudyLanguageValue={this.changeStudyLanguageHandler}
+                                                        languageId={0}
+                                                        levelId={0}
+                                                        credit={0}
+                                                        pickedLanguages={this.state.pickedLanguages}
+                                                        unavailableLanguages={this.state.teachLanguages}
 
                                 />
                             }
                         </div>
                         <div>
-                            <Typography variant="h6" >
-                                <Link href={"mailto:google.sk"}>
+                            <Typography variant="h6">
+                                <Button className={"tandem-more-languages-button"} variant="contained">
                                     {t("preference_missing_language")}
-                                </Link>
+                                </Button>
                             </Typography>
                         </div>
                         <PreferenceActionButtons
@@ -455,8 +468,8 @@ class TandemPreferences extends React.Component {
             case preferenceStepType.generalPreferences: {
                 page = (
                     <div>
-                        <TandemHeader title={t("Preferences_M")} displayArrow={true} backAction={this.backHandler} />
-                        <TandemGeneralPreferencesInput />
+                        <TandemHeader title={t("Preferences_M")} displayArrow={true} backAction={this.backHandler}/>
+                        <TandemGeneralPreferencesInput/>
                     </div>
                 );
                 break;
@@ -464,10 +477,7 @@ class TandemPreferences extends React.Component {
             case preferenceStepType.avatar: {
                 page = (
                     <div>
-                        {/*<Typography className={classes.title} variant="h5" >*/}
-                            {/*{t("preference_avatar_input_header")}*/}
-                        {/*</Typography>*/}
-                        <AvatarInput onChange={this.avatarPicked} />
+                        <AvatarInput onChange={this.avatarPicked}/>
                         <PreferenceActionButtons
                             type={this.state.type}
                             step={this.state.step}

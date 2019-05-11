@@ -1,4 +1,9 @@
+/*
+	Load all necessary files and data from this file
+*/
+
 // Methods
+import './methods/tandemAdminMethods';
 import './methods/tandemUserLanguages';
 import './methods/tandemUserMatches';
 import './methods/tandemUserLanguageMatches';
@@ -7,6 +12,7 @@ import './methods/hasUserMatches';
 import './methods/reportUserInRoom';
 import './methods/executeLanguageMatching';
 import './methods/reloadLanguageMatching';
+import './methods/tandemSendEmail';
 // Publications
 import './publications/tandemUserLanguages';
 import './publications/tandemLanguages';
@@ -19,6 +25,9 @@ import TandemLanguageMatches from './models/TandemLanguageMatches';
 import './startup';
 import './startupForAuthorizations';
 
+/*
+	Even though no package is dependent on this package this code may or may not be here so far
+*/
 export {
 	TandemUserLanguages,
 	TandemUserMatches,

@@ -1,9 +1,12 @@
 import React, {Component} from 'react';
 import PropTypes from 'prop-types';
+import { t } from 'meteor/rocketchat:utils';
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////	Material UI
 import Link from '@material-ui/core/Link';
 import Typography from '@material-ui/core/Typography';
 import {withStyles} from '@material-ui/core/styles';
-import { t } from 'meteor/rocketchat:utils';
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////	Styles
 
 const styles = theme => ({
     input: {
@@ -19,6 +22,7 @@ const styles = theme => ({
     }
 });
 
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////	Class
 
 class AvatarInput extends React.Component {
     state = {
@@ -42,8 +46,7 @@ class AvatarInput extends React.Component {
                     <Link className={classes.button}
                           color="primary"
                           size="big"
-                          href="/account/profile"
-                          target="_blank">
+                          href="/account/profile">
                         {t("preferences_user")}
                     </Link>
                 </Typography>

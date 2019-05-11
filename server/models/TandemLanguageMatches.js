@@ -1,51 +1,80 @@
 import {Base} from 'meteor/rocketchat:models';
 
+/*
+	Model for language matches between users' language preferences used in the matching algorithm
+*/
+
 export class TandemLanguageMatches extends Base {
-	constructor() {
-		super('tandem_language_matches');
+    constructor() {
+        super('tandem_language_matches');
 
-		this.model.before.insert((userId, doc) => {
-			doc.hidden = false;
-		});
+        this.model.before.insert((userId, doc) => {
+            doc.hidden = false;
+        });
+    }
 
-	}
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////	Insert
 
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////	Insert
+    /**
+     * Creates a new user match
+     **/
+    createUserMatch(userId, match, symmetricLanguageId) {
+        return this.insert(
+            {
+                usersInMatch: [userId, match.userId],
+                languagesInMatch: [match.langId, symmetricLanguageId]
+            });
+    }
 
-	createSymetricMatchAsStudent(studentId, match, symetricLanguageId) {
-		return this.insert(
-			{
-				symetric: true,
-				usersInMatch: [studentId, match.userId],
-				languagesInMatch: [match.langId, symetricLanguageId]
-			});
-	}
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////	Custom
 
-	createSymetricMatchAsTeacher(teacherId, match, symetricLanguageId) {
-		return this.insert({
-			symetric: true,
-			usersInMatch: [teacherId, match.userId],
-			languagesInMatch: [match.langId, symetricLanguageId]
-		});
-	}
+    /**
+     * Method changes the match hidden attribute to true.
+     **/
+    hideMatch(matchId) {
+        return this.update(
+            {
+                _id: matchId
+            },
+            {
+                $set: {hidden: true}
+            });
+    }
 
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////	Custom
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////	Find
 
-	hideMatch(matchId) {
-		return this.update({_id: matchId}, {$set: {hidden: true}});
-	}
+    /**
+     * Straightforward
+     **/
+    findMatches(query) {
+        return this.find(query);
+    }
 
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////	Find
+    /**
+     * Straightforward
+     **/
+    findAll() {
+        return this.find({});
+    }
 
-	findMatches(query) {
-		return this.find(query);
-	}
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////	Delete
 
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////	Delete
+    /**
+     * Straightforward
+     **/
+    removeMatchesWhereUser(userId) {
+        return this.remove(
+            {
+                usersInMatch: userId
+            });
+    }
 
-	removeMatchesWhereUser(userId) {
-		return this.remove({usersInMatch: userId});
-	}
+    /**
+     * Straightforward
+     **/
+    removeAll() {
+        return this.remove({});
+    }
 }
 
 export default new TandemLanguageMatches();
