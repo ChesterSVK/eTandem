@@ -1,4 +1,6 @@
+import { t } from 'meteor/rocketchat:utils';
 import React from 'react';
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////	Material UI
 import PropTypes from 'prop-types';
 import { withStyles } from '@material-ui/core/styles';
 import Card from '@material-ui/core/Card';
@@ -6,7 +8,8 @@ import CardActions from '@material-ui/core/CardActions';
 import CardContent from '@material-ui/core/CardContent';
 import Button from '@material-ui/core/Button';
 import Typography from '@material-ui/core/Typography';
-import { t } from 'meteor/rocketchat:utils';
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////	Styles
 
 const styles = {
   card: {
@@ -19,6 +22,8 @@ const styles = {
   },
 
 };
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////	Function
 
 function PreferenceItem(props) {
   const { classes } = props;

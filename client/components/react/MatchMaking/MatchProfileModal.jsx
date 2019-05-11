@@ -7,8 +7,8 @@ import {callbacks} from 'meteor/rocketchat:callbacks';
 import {t, roomTypes} from 'meteor/rocketchat:utils';
 import {hasAllPermission} from 'meteor/rocketchat:authorization';
 import toastr from "toastr";
-
 import React from 'react';
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////	Material UI
 import Button from '@material-ui/core/Button';
 import Dialog from '@material-ui/core/Dialog';
 import DialogActions from '@material-ui/core/DialogActions';
@@ -24,6 +24,8 @@ import Card from '@material-ui/core/Card';
 import CardContent from '@material-ui/core/CardContent';
 import CardActionArea from '@material-ui/core/CardActionArea';
 
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////	Styles
+
 const styles = ({
     dialogRoot: {},
     dialogContent: {
@@ -34,20 +36,21 @@ const styles = ({
         margin: "auto",
     },
     dialogUserName: {
+        opacity: 0.6,
         textAlign: "center",
         padding: "0.3em 1.3em",
+        marginTop: "-1.8em",
+        position: "relative",
     },
     listItem: {
         paddingTop: 16,
         paddingBottom: 16,
         paddingLeft: "2em",
         paddingRight: "2em",
-        minWidth: 300
     },
     card: {
         maxWidth: 336,
         minWidth: 168,
-        minHeight: 288,
         maxHeight: 576,
         margin: 5
     },
@@ -57,64 +60,34 @@ const styles = ({
     h6: {
         fontSize: 16,
     },
+    navHolder: {
+        padding: "1em 1em 1em 0",
+    },
     subh: {
         fontSize: 13,
     }
 });
 
-
-function getSymetricLanguage(matchingLangs, matchingLang) {
-    if (matchingLangs.length === 1) {
-        return t('symetric_language_undefied');
-    }
-    return matchingLangs[0] === matchingLang ? matchingLangs[1] : matchingLangs[0];
-}
-
-function createChannel(match) {
-    const users = [Meteor.user().username, match.teacher.username];
-    const matchingLanguage = match.matchingLanguage;
-    const symetricLanguage = getSymetricLanguage(match.languagesInMatch, matchingLanguage);
-    const name = '[' + matchingLanguage + '] ' + match.teacher.username + ' - ' + Meteor.user().username + ' [' + symetricLanguage + ']';
-    const readOnly = false;
-
-
-    Meteor.call('createPrivateGroup', name, users, readOnly, {}, {
-        topic: t("tandem_room_topic", {
-            lang1: matchingLanguage,
-            lang2: symetricLanguage
-        })
-    }, function (err, result) {
-        if (err) {
-            if (err.error === 'error-invalid-name') {
-                toastr.error(t("error-invalid-name"), t("error-invalid-name"));
-            }
-            if (err.error === 'error-invalid-room-name') {
-                toastr.error(t("error-invalid-room-name", {room_name: name}), t("error-invalid-room-name", {room_name: name}));
-            }
-            if (err.error === 'error-duplicate-channel-name') {
-                toastr.error(t("error-duplicate-channel-name", {channel_name: name}), t("error-duplicate-channel-name", {channel_name: name}));
-            }
-            console.log(err);
-        }
-        else {
-            Meteor.call('tandemUserMatches/createMatchingRequest', match, result.rid, (error1, result1) => {
-                if (error1) {
-                    toastr.error(t("error-creating-user-match"));
-                }
-                else {
-                    toastr.success(t("success-creating-user-match"));
-                    return FlowRouter.go('group', {name: result1.name}, FlowRouter.current().queryParams);
-                }
-            });
-        }
-    });
-    return false;
-}
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////	Class
 
 class MatchProfileModal extends React.Component {
     state = {
         open: false,
     };
+
+    createChannel(match) {
+        Meteor.call('tandemUserMatches/createMatchingRequest', match, function (err, result) {
+            if (err) {
+                toastr.error(t(err.error), t(err.reason));
+            }
+            else {
+                toastr.success(t("success-creating-user-match"));
+                return FlowRouter.go('group', {name: result.name}, FlowRouter.current().queryParams);
+            }
+        });
+
+        return false;
+    }
 
     handleClickOpen = () => {
         this.setState({open: true});
@@ -126,7 +99,7 @@ class MatchProfileModal extends React.Component {
 
     handleRequest = (match) => {
         // console.log(match);
-        createChannel(match);
+        this.createChannel(match);
         this.setState({open: false});
     };
 
@@ -147,7 +120,8 @@ class MatchProfileModal extends React.Component {
                         {props.match.teacher.username}
                     </Typography>
                     <Typography className={classes.subh} component="p">
-                        {t("looks_for")} {this.getTeachersLanguage(props.match.languagesInMatch, props.match.matchingLanguage)}
+                        {t("looks_for")}
+                        {this.getTeachersLanguage(props.match.languagesInMatch, props.match.matchingLanguage)}
                     </Typography>
                 </CardContent>
             </CardActionArea>
@@ -158,23 +132,24 @@ class MatchProfileModal extends React.Component {
         return (
             <div>
                 <DialogContent className={classes.dialogContent + '  tandem-dialog-content'}>
-                    <Typography variant="h4"
-                                className={classes.dialogUserName + " sidebar__header-status-bullet--" + props.match.teacher.status}>
-                        {this.props.match.teacher.name}
-                    </Typography>
                     <div className={classes.avatarHolder}>
                         <Blaze template="avatar"
                                username={props.match.teacher.username}/>
+                        <Typography variant="h4"
+                                    className={classes.dialogUserName  + " sidebar__header-status-bullet--" + props.match.teacher.status}>
+                            {this.props.match.teacher.name}
+                        </Typography>
                     </div>
-                    <List component="nav">
-                        <ListItem className={classes.listItem}>
-                            {props.match.teacher.customFields && props.match.teacher.customFields.tandemSentence ?
+                    <List component="nav"
+                          className={classes.navHolder}>
+                        {props.match.teacher.customFields && props.match.teacher.customFields.tandemSentence ?
+                            <ListItem className={classes.listItem}>
                                 <div>
                                     <ListItemText secondary={t("about_me")}/>
                                     <ListItemText primary={props.match.teacher.customFields.tandemSentence}/>
                                 </div>
-                                : ""}
-                        </ListItem>
+                            </ListItem>
+                            : ""}
                         <ListItem className={classes.listItem}>
                             <div>
                                 <ListItemText secondary={t("teaches")}/>
@@ -185,7 +160,11 @@ class MatchProfileModal extends React.Component {
                             <div>
                                 <ListItemText secondary={t("looks_for")}/>
                                 <ListItemText
-                                    primary={this.getTeachersLanguage(props.match.languagesInMatch, props.match.matchingLanguage)}/>
+                                    primary={
+                                        this.getTeachersLanguage(
+                                            props.match.languagesInMatch,
+                                            props.match.matchingLanguage)
+                                    }/>
                             </div>
                         </ListItem>
                     </List>
@@ -218,9 +197,9 @@ class MatchProfileModal extends React.Component {
                     onClose={this.handleClose}
                     aria-labelledby="alert-dialog-title"
                     aria-describedby="alert-dialog-description">
-                {
-                    this.getDialogData(this.state, this.props, classes)
-                }
+                    {
+                        this.getDialogData(this.state, this.props, classes)
+                    }
                 </Dialog>
             </div>
         );

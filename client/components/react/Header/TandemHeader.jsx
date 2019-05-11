@@ -8,6 +8,7 @@ import MenuIcon from '@material-ui/icons/Menu';
 import ArrowIcon from '@material-ui/icons/KeyboardArrowLeft';
 import {withStyles} from '@material-ui/core/styles';
 
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////	Styles
 const styles = (theme) => ({
     root: {
         flexGrow: 1,
@@ -28,6 +29,7 @@ const styles = (theme) => ({
     }
 })
 
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////	Header
 function TandemHeader(props) {
     const {
         classes, displayArrow, noLeftButton, backAction, title, linkTo, position = 'fixed', className, action = () => {

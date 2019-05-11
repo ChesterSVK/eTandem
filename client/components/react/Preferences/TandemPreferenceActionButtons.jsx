@@ -1,9 +1,12 @@
+import { t } from 'meteor/rocketchat:utils';
+import { preferenceScreenType, preferenceStepType } from './TandemPreferences';
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////	Material UI
 import React, { Component } from 'react'
 import Button from '@material-ui/core/Button';
-import { preferenceScreenType, preferenceStepType } from './TandemPreferences';
 import { withStyles } from '@material-ui/core/styles';
 import { Typography } from '@material-ui/core';
-import { t } from 'meteor/rocketchat:utils';
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////	Styles
 
 const styles = {
     button: {
@@ -16,6 +19,8 @@ const styles = {
         margin: 8
     }
 }
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////	Class
 
 class PreferenceActionButtons extends Component {
 

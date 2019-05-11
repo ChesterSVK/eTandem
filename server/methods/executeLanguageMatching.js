@@ -7,6 +7,72 @@ import TandemUsersMatches from '../models/TandemUsersMatches'
 import TandemLanguageMatches from '../models/TandemLanguageMatches'
 import {TeachingMotivationEnum, LanguageLevelsEnum, MatchingRequestStateEnum} from "../../lib/helperData";
 
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////	Methods
+
+Meteor.methods({
+
+    /**
+	 * Executes language matching algorithm
+     * @param userId what user requested the matching
+     * @param newLangPreferences user's preferences
+     * @returns {boolean} if execution was successful
+     */
+    executeLanguageMatching(userId, newLangPreferences) {
+        if (!userId) return false;
+
+        if (!Array.isArray(newLangPreferences)) return false;
+
+        if (!newLangPreferences.length) newLangPreferences = TandemUserLanguages.findByUserId(userId).fetch();
+
+        if (!newLangPreferences.length) return false;
+
+        return execute(userId, newLangPreferences);
+    },
+});
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////	Private functions
+
+function execute(userId, newLangPreferences) {
+    const user = Users.findOneById(userId);
+
+    TandemLanguageMatches.removeMatchesWhereUser(userId);
+
+    const filteredPreferences = filterPreferencesFromExistingMatches(newLangPreferences);
+    filteredPreferences.forEach(function (filteredPreference) {
+
+        const allMatchingLanguagePreferencesExceptUser = findLanguagePreferenceMatch(userId, filteredPreference);
+        createSymmetricMatches(user, allMatchingLanguagePreferencesExceptUser, filteredPreference.motivation);
+    });
+
+    return true;
+}
+
+function filterPreferencesFromExistingMatches(preferences) {
+    return preferences.filter(preference => {
+        return getExistingMatchesNotEqualToUser(preference.userId, preference.langId).count() === 0;
+    });
+}
+
+/**
+ * Get all language matches with opposite motivation than user's
+ * @param userId
+ * @param preference users preference
+ * @returns {*|Promise<Response>}
+ */
+function findLanguagePreferenceMatch(userId, preference) {
+    return TandemUserLanguages.findLanguageMatches(
+        userId,
+        negateMotivation(preference.motivation),
+        preference.langId,
+        getLanguageLevels(preference.levelId, preference.motivation)
+    ).fetch();
+}
+
+/**
+ * Negates the motivation for languages
+ * @param motivation to negate
+ * @returns {string} opposite motivation
+ */
 function negateMotivation(motivation) {
 	if (motivation === TeachingMotivationEnum.WTLEARN) {
 		return TeachingMotivationEnum.WTTEACH;
@@ -16,6 +82,14 @@ function negateMotivation(motivation) {
 	}
 }
 
+/**
+ * Get all language levels that are less/greater or equal than some level, depending on the motivation
+ * E.g motivation = WTTEACH, level = B2 , result = [A1,A2,B1,B2] so some user can teach on B2 and the user can have only student matches with less or equal motivation of learning
+ * E.g motivation = WTLEARN, level = B2 , result = [B2,C1,C2] so some user wants to learn B2 and the user can have only teacher matches with higher or equal experience of teaching
+ * @param levelId to compare with
+ * @param motivation to set the comparison condition
+ * @returns {Array} of language levels
+ */
 function getLanguageLevels(levelId, motivation) {
 	let comparator = false;
 	if (motivation === TeachingMotivationEnum.WTLEARN) {
@@ -33,7 +107,7 @@ function getLanguageLevels(levelId, motivation) {
 			}
 			if (LanguageLevelsEnum[property] === levelId) {
 				comparator = !comparator;
-				//To allow (greater or equal) or (smaller or equal)
+				//To allow equal level as well
 				if (comparator) {
 					resLevels.push(LanguageLevelsEnum[property])
 				}
@@ -43,6 +117,11 @@ function getLanguageLevels(levelId, motivation) {
 	return resLevels;
 }
 
+/**
+ * Custom helper object to help with comparison and conditions of finding the right user language match
+ * Contains language that user can teach and language level teaching experience value
+ * @param languagesToTeach
+ */
 function createLanguagesLevelObject(languagesToTeach) {
 	// Object format:
 	// { langId : langLevel, ... }
@@ -53,25 +132,36 @@ function createLanguagesLevelObject(languagesToTeach) {
 	return result;
 }
 
+/**
+ * Gets user languages with opposite motivation
+ * @param user
+ * @param motivation
+ * @returns {*|Promise<Response>}
+ */
+function getUsersLanguagesWithOppositeMotivation(user, motivation){
+    return TandemUserLanguages.findUserLanguages(
+        user._id,
+        negateMotivation(motivation)
+    ).fetch();
+}
 
-function createSymetricMatches(user, otherUsersLanguagePreferences, newLangPreferenceMotivation) {
+function createSymmetricMatches(user, otherUsersLanguagePreferences, newLangPreferenceMotivation) {
 
 	if (!otherUsersLanguagePreferences.length) return;
 
-	const usersLanguagesWithOppositeMotivation = TandemUserLanguages.findUserLanguages(
-		user._id,
-		negateMotivation(newLangPreferenceMotivation)
-	).fetch();
-
+	const usersLanguagesWithOppositeMotivation = getUsersLanguagesWithOppositeMotivation(user, newLangPreferenceMotivation);
 	if (!usersLanguagesWithOppositeMotivation.length) return;
 
 	let languageLevelsObject = createLanguagesLevelObject(usersLanguagesWithOppositeMotivation);
 
 	otherUsersLanguagePreferences.forEach(function (languagePreferenceOfOtherUser) {
-		TandemUserLanguages.findUserLanguages(
-			languagePreferenceOfOtherUser.userId,
-			newLangPreferenceMotivation
-		).fetch().forEach(function (userLanguagePreference) {
+
+        const otherUsersLanguagePreferencesWithOppositeMotivation = TandemUserLanguages.findUserLanguages(
+            languagePreferenceOfOtherUser.userId,
+            newLangPreferenceMotivation
+        ).fetch();
+
+		otherUsersLanguagePreferencesWithOppositeMotivation.forEach(function (userLanguagePreference) {
 			if (otherUserIsNotAlreadyInSomeMatch(userLanguagePreference)){
 				createSuitableMatches(userLanguagePreference, languageLevelsObject, newLangPreferenceMotivation, languagePreferenceOfOtherUser, user);
 			}
@@ -84,6 +174,11 @@ function createSymetricMatches(user, otherUsersLanguagePreferences, newLangPrefe
 	});
 }
 
+/**
+ * @param userLanguagePreference user's language preference
+ * @returns {boolean} true if user is already in some existing user match with same language preferences,
+ * 		false otherwise
+ */
 function otherUserIsNotAlreadyInSomeMatch(userLanguagePreference) {
 	return TandemUsersMatches.findWithOptions({
 		$or: [
@@ -101,8 +196,16 @@ function otherUserIsNotAlreadyInSomeMatch(userLanguagePreference) {
 	}).count() === 0;
 }
 
+/**
+ * Create suitable user matches according to provided parameters
+ * @param userLanguagePreference language preference of the user
+ * @param languageLevelsObject custom made object to match language level in possible user match
+ * @param newLangPreferenceMotivation motivation of the new language preference
+ * @param languagePreferenceOfOtherUser preferences of ther users based on som criteria
+ * @param user
+ */
 function createSuitableMatches(userLanguagePreference, languageLevelsObject, newLangPreferenceMotivation, languagePreferenceOfOtherUser, user) {
-	//symetric match not found in the lang levels object
+	//Symmetric match not found in the lang levels object
 	if (languageLevelsObject[userLanguagePreference.langId] === undefined) return;
 	// Match for learning
 	if (newLangPreferenceMotivation === TeachingMotivationEnum.WTLEARN) {
@@ -111,7 +214,7 @@ function createSuitableMatches(userLanguagePreference, languageLevelsObject, new
 			negateMotivation(newLangPreferenceMotivation)
 		).includes(userLanguagePreference.levelId)) {
 
-			TandemLanguageMatches.createSymetricMatchAsStudent(user._id, languagePreferenceOfOtherUser, userLanguagePreference.langId);
+			TandemLanguageMatches.createUserMatch(user._id, languagePreferenceOfOtherUser, userLanguagePreference.langId);
 		}
 	}
 	// Match for teaching
@@ -121,30 +224,17 @@ function createSuitableMatches(userLanguagePreference, languageLevelsObject, new
 			negateMotivation(newLangPreferenceMotivation)
 		).includes(userLanguagePreference.levelId)) {
 
-			TandemLanguageMatches.createSymetricMatchAsTeacher(user._id, languagePreferenceOfOtherUser, userLanguagePreference.langId);
+			TandemLanguageMatches.createUserMatch(user._id, languagePreferenceOfOtherUser, userLanguagePreference.langId);
 		}
 	}
 }
 
-
-// function getUserExistingMatches(userId, languageId) {
-// 	return TandemUsersMatches.findWithOptions(
-// 		{
-// 			$or: [
-// 				{
-// 					"matchingLanguage.matchingLanguageId": languageId,
-// 					"matchingLanguage.matchingLanguageTeacherId": userId
-// 				},
-// 				{
-// 					"symetricLanguage.symetricLanguageId": languageId,
-// 					"symetricLanguage.symetricLanguageTeacherId": userId
-// 				},
-// 			],
-// 			status: {$in: [MatchingRequestStateEnum.ACCEPTED, MatchingRequestStateEnum.PENDING]},
-// 			unmatched: false
-// 		});
-// }
-
+/**
+ * Returns all user matches that are not userId's with specified language
+ * @param userId to filter
+ * @param languageId to match the language
+ * @returns {*}
+ */
 function getExistingMatchesNotEqualToUser(userId, languageId) {
 	return TandemUsersMatches.findWithOptions(
 		{
@@ -161,55 +251,4 @@ function getExistingMatchesNotEqualToUser(userId, languageId) {
 			status: {$in: [MatchingRequestStateEnum.ACCEPTED, MatchingRequestStateEnum.PENDING]},
 			unmatched: false
 		});
-}
-
-
-Meteor.methods({
-	executeLanguageMatching(userId, newLangPreferences) {
-		if (!userId) return false;
-
-		if (!Array.isArray(newLangPreferences)) return false;
-
-		if (!newLangPreferences.length) newLangPreferences = TandemUserLanguages.findByUserId(userId).fetch();
-
-		if (!newLangPreferences.length) return false;
-
-		return execute(userId, newLangPreferences);
-	},
-});
-
-function execute(userId, newLangPreferences) {
-	const user = Users.findOneById(userId);
-
-	TandemLanguageMatches.removeMatchesWhereUser(userId);
-
-	//Filter preferences by already existing matches
-	const filteredPreferences = newLangPreferences.filter(newLangPreference => {
-		return getExistingMatchesNotEqualToUser(newLangPreference.userId, newLangPreference.langId).count() === 0;
-	});
-
-	filteredPreferences.forEach(function (filteredPreference) {
-
-		// Find language preference matches
-		const allMatchingLanguagePreferencesExceptUser = TandemUserLanguages.findLanguageMatches(
-			userId,
-			negateMotivation(filteredPreference.motivation),
-			filteredPreference.langId,
-			getLanguageLevels(filteredPreference.levelId, filteredPreference.motivation)
-		).fetch();
-
-		// //Filter those who already teach something and does not want to teach more
-		// const filteredMatchingLanguagePreferencesExceptUser = allMatchingLanguagePreferencesExceptUser.filter(preferenceItem => {
-		// 	if (getUserPreference(preferenceItem.userId, 'tandemAllowMultipleTeachings', false)) {
-		// 		return true;
-		// 	}
-		// 	else {
-		// 		return getUserExistingMatches(preferenceItem.userId, preferenceItem.langId).count() === 0;
-		// 	}
-		// });
-
-		createSymetricMatches(user, allMatchingLanguagePreferencesExceptUser, filteredPreference.motivation);
-	});
-
-	return true;
 }

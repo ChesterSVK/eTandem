@@ -1,7 +1,7 @@
 import {t} from 'meteor/rocketchat:utils';
 import MatchProfileModal from "./MatchProfileModal";
-
 import React from 'react';
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////	Material UI
 import PropTypes from 'prop-types';
 import Typography from '@material-ui/core/Typography';
 import Link from '@material-ui/core/Link';
@@ -12,6 +12,7 @@ import ListItem from '@material-ui/core/ListItem';
 import ListItemText from '@material-ui/core/ListItemText';
 import {withStyles} from '@material-ui/core/styles';
 
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////	Styles
 
 const styles = ({
     root: {
@@ -54,6 +55,7 @@ const styles = ({
     },
 });
 
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////	Class
 
 class TandemMatches extends React.Component {
     state = {
@@ -72,7 +74,7 @@ class TandemMatches extends React.Component {
 
     openModal = () => {
         this.setState({open: true})
-    }
+    };
 
     handleClose = () => {
         this.setState({open: false});

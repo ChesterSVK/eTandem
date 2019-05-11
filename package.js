@@ -16,8 +16,10 @@ Package.onUse(function(api) {
 		'rocketchat:settings',
 		'rocketchat:models',
 		'rocketchat:utils',
+        'rocketchat:ui-utils',
 		'tap:i18n',
 		'templating',
+        'jquery',
 	]);
 	api.mainModule('client/index.js', 'client');
 	api.mainModule('server/index.js', 'server');

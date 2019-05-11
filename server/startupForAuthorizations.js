@@ -2,18 +2,23 @@
 import {Meteor} from 'meteor/meteor';
 import {Roles, Permissions} from 'meteor/rocketchat:models';
 
+/*
+	Add custom tandem roles and permissions to existing ones during startup
+*/
 Meteor.startup(function () {
 	// Note:
-	// 1.if we need to create a role that can only edit channel message, but not edit group message
-	// 2. admin, moderator, and user roles should not be deleted as they are referened in the code.
+	// 1. if we need to create a role that can only edit channel message, but not edit group message
+	// 2. admin, moderator, and user roles should not be deleted as they are referred in the code.
 	const permissions = [
 		// Tandem addition
 		{_id: 'tandem-view-directory', roles: ['admin']},
 		{_id: 'tandem-search', roles: ['admin']},
-		{_id: 'tandem-report-user', roles: ['admin', 'tandem-student']},
-		{_id: 'tandem-unmatch', roles: ['admin', 'tandem-student']},
+		{_id: 'tandem-report-user', roles: ['admin', 'tandem-user']},
+		{_id: 'tandem-unmatch', roles: ['admin', 'tandem-user']},
 		{_id: 'tandem-ui-sort', roles: ['admin']},
+        {_id: 'tandem-hide', roles: ['admin']},
 		{_id: 'tandem-ui-view-mode', roles: ['admin']},
+        {_id: 'tandem-developer', roles: ['admin']},
 	];
 
 	for (const permission of permissions) {
@@ -23,9 +28,7 @@ Meteor.startup(function () {
 	}
 
 	const tandemRoles = [
-		{name: 'tandem-admin', scope: 'Users', description: 'Tandem admin'},
-		{name: 'tandem-teacher', scope: 'Users', description: 'Tandem teacher'},
-		{name: 'tandem-student', scope: 'Users', description: 'Tandem student'},
+		{name: 'tandem-user', scope: 'Users', description: 'Tandem user'},
 	];
 
 	for (const role of tandemRoles) {

@@ -2,6 +2,9 @@
 import {Meteor} from 'meteor/meteor';
 import TandemLanguages from './models/TandemLanguages';
 
+/*
+	Create additional data for the package during startup process
+*/
 Meteor.startup(function () {
 
 	// Developer note - language name must not contain spaces and brackets otherwise rooms and room requests cannot be created

@@ -1,6 +1,11 @@
 import { Base } from 'meteor/rocketchat:models';
 import {MatchingRequestStateEnum} from '../../lib/helperData'
 
+/*
+	Model for user matches that have been created after finding suitable match between users
+*/
+
+
 export class TandemUsersMatches extends Base {
 	constructor() {
 		super('tandem_users_matches');
@@ -21,24 +26,37 @@ export class TandemUsersMatches extends Base {
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////	Insert
 
-	createUserMatchByLanguageMatch(userId, languageMatch, roomId, matchingLangId, symetricLangId){
+    /**
+     * Create user match based on the user language match
+     **/
+	createUserMatchByLanguageMatch(requestedByUser, teacherId, usersIds, roomId, matchingLangId, symetricLangId){
 		return this.insert({
-			requestedBy: userId,
-			users : [userId, languageMatch.teacher._id],
+			requestedBy: requestedByUser,
+			users : usersIds ,
 			roomId : roomId,
 			matchingLanguage: {
 				matchingLanguageId : matchingLangId,
-				matchingLanguageTeacherId : languageMatch.teacher._id,
+				matchingLanguageTeacherId : teacherId,
 			},
 			symetricLanguage: {
 				symetricLanguageId : symetricLangId,
-				symetricLanguageTeacherId : userId
+				symetricLanguageTeacherId : requestedByUser
 			},
 		});
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////	Find
 
+	/**
+     * Straightforward
+     **/
+    findAll() {
+        return this.find({});
+    }
+
+    /**
+     * Straightforward
+     **/
 	findByUserId(userId) {
 		const query = {
 			users : userId,
@@ -46,6 +64,9 @@ export class TandemUsersMatches extends Base {
 		return this.find(query);
 	}
 
+    /**
+     * Straightforward
+     **/
 	findByUserIdAndRoomId(userId, roomId) {
 		const query = {
 			users : userId,
@@ -54,43 +75,76 @@ export class TandemUsersMatches extends Base {
 		return this.findOne(query);
 	}
 
+    /**
+     * Straightforward
+     **/
 	findWithOptions(options){
 		return this.find(options);
 	}
 
+    /**
+     * Straightforward
+     **/
 	findMatches(userId, unmatched = false){
 		return this.find({ users : userId, unmatched: unmatched});
 	}
 
+    /**
+     * Straightforward
+     **/
 	findOneByRoomId(roomId){
 		return this.findOne({roomId: roomId});
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////	Custom
 
-	reportUserInMatch(fromUserId, matchId, reportedUserId) {
+    /**
+     * Set reported users in given user match
+     **/
+	reportUserInMatch(fromUserId, matchId, reportedUserId, reason) {
 		return this.update({_id: matchId}, {
 			$push : {
-				reportedUsers: { from : fromUserId , to : reportedUserId }
+				reportedUsers: { from : fromUserId , to : reportedUserId, reason: reason }
 			}
 		});
 	}
 
+    /**
+     * Update user match state to unmatched
+     **/
 	unmatchMatch(matchId, state){
 		return this.update({_id: matchId}, { $set : { unmatched : state}});
 	}
 
+    /**
+     * Update user match status to MatchingRequestStateEnum.ACCEPTED
+     **/
 	acceptMatchRequest(roomId){
 		return this.update({roomId: roomId}, {$set : {status : MatchingRequestStateEnum.ACCEPTED}});
 	}
 
+    /**
+     * Update user match status to MatchingRequestStateEnum.Declined
+     **/
 	declineMatchRequest(roomId){
 		return this.update({roomId: roomId}, {$set : {status : MatchingRequestStateEnum.DECLINED}});
 	}
 
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////	Remove
+
+    /**
+     * Straightforward
+     **/
 	removeById(matchId) {
 		return this.remove(matchId);
 	}
+
+    /**
+     * Straightforward
+     **/
+    removeAll() {
+        return this.remove({});
+    }
 }
 
 export default new TandemUsersMatches();

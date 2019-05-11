@@ -2,8 +2,8 @@ import {Meteor} from 'meteor/meteor';
 import {FlowRouter} from 'meteor/kadira:flow-router';
 import {MatchingRequestStateEnum} from "../../../../lib/helperData";
 import {t, handleError} from 'meteor/rocketchat:utils';
-
 import React, {Component} from 'react';
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////	Material UI
 import PropTypes from 'prop-types';
 import {withStyles} from '@material-ui/core/styles';
 import Card from '@material-ui/core/Card';
@@ -13,6 +13,7 @@ import Divider from '@material-ui/core/Divider';
 import Blaze from 'meteor/gadicc:blaze-react-component';
 import Button from '@material-ui/core/Button';
 
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////	Styles
 
 const styles = theme => ({
     root: {
@@ -79,11 +80,12 @@ const styles = theme => ({
         padding: 15,
     },
     tileDataAvatar: {
-        marginLeft: "20px",
         width: "140px",
         height: "140px"
     }
 });
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////	Class
 
 class ListMatches extends React.Component {
     constructor(props) {
@@ -121,22 +123,6 @@ class ListMatches extends React.Component {
             tileData.matchingLanguageTeacher.username
             :
             tileData.symetricLanguageTeacher.username;
-    }
-
-    getPending(matches) {
-        return this.getGeneralRender(matches, t("My_Pending"));
-    }
-
-    getDeclined(matches) {
-        return this.getGeneralRender(matches, t("My_Declined"));
-    }
-
-    getCompleted(matches) {
-        return this.getGeneralRender(matches, t("My_Completed"));
-    }
-
-    getAccepted(matches) {
-        return this.getGeneralRender(matches, t("My_students"));
     }
 
     getGeneralRender(matches, title) {
@@ -183,21 +169,25 @@ class ListMatches extends React.Component {
     render() {
         return (
             <div>
-                {this.getAccepted(
-                    this.state.userMatches.filter(match => match.status === MatchingRequestStateEnum.ACCEPTED))
-                }
+                {this.getGeneralRender(
+                    this.state.userMatches.filter(match => match.status === MatchingRequestStateEnum.ACCEPTED),
+                    t("My_Students")
+                )}
                 <Divider/>
-                {this.getCompleted(
-                    this.state.userMatches.filter(match => match.status === MatchingRequestStateEnum.COMPLETED))
-                }
+                {this.getGeneralRender(
+                    this.state.userMatches.filter(match => match.status === MatchingRequestStateEnum.COMPLETED),
+                    t("My_Completed")
+                )}
                 <Divider/>
-                {this.getPending(
-                    this.state.userMatches.filter(match => match.status === MatchingRequestStateEnum.PENDING))
-                }
+                {this.getGeneralRender(
+                    this.state.userMatches.filter(match => match.status === MatchingRequestStateEnum.PENDING),
+                    t("My_Pending")
+                )}
                 <Divider/>
-                {this.getDeclined(
-                    this.state.userMatches.filter(match => match.status === MatchingRequestStateEnum.DECLINED))
-                }
+                {this.getGeneralRender(
+                    this.state.userMatches.filter(match => match.status === MatchingRequestStateEnum.DECLINED),
+                    t("My_Declined")
+                )}
             </div>
         )
     }

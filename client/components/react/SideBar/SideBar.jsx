@@ -1,7 +1,9 @@
 import {Meteor} from 'meteor/meteor';
-import { t } from 'meteor/rocketchat:utils';
-
+import {t} from 'meteor/rocketchat:utils';
 import React from 'react';
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////	Material UI
+
 import PropTypes from 'prop-types';
 import {withStyles} from '@material-ui/core/styles';
 import List from '@material-ui/core/List';
@@ -14,6 +16,8 @@ import SchoolIcon from '@material-ui/icons/School';
 import AssignmentIndIcon from '@material-ui/icons/AssignmentInd';
 import PeopleIcon from '@material-ui/icons/People';
 
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////	Styles
+
 const styles = theme => ({
     root: {
         width: '100%',
@@ -23,14 +27,14 @@ const styles = theme => ({
         fontSize: "1.5em",
         marginBottom: "1em"
     },
-    no_padding : {
-        padding : '0',
+    no_padding: {
+        padding: '0',
     },
-    no_padding_bottom : {
-        paddingBottom : '0',
+    no_padding_bottom: {
+        paddingBottom: '0',
     },
-    divider : {
-        marginBottom : '0.8em',
+    divider: {
+        marginBottom: '0.8em',
     }
 });
 
@@ -47,8 +51,8 @@ function SimpleList(props) {
             <h3 className={classes.userName}>
                 {Meteor.user().name}
             </h3>
-            <Divider className={classes.divider} />
-            { props.showListMatchesLink &&
+            <Divider className={classes.divider}/>
+            {props.showListMatchesLink &&
             <List component="nav">
                 <h3 className={"rooms-list__type " + classes.no_padding_bottom}>
                     <ListItemLink href="/listMatches" className={"sidebar-item tandem-link"}>
@@ -72,7 +76,8 @@ function SimpleList(props) {
             </List>
             <List component="nav">
                 <h3 className={"rooms-list__type " + classes.no_padding_bottom}>
-                    <ListItemLink href="https://digicampus.fi/course/view.php?id=33" target="_blank" className={"sidebar-item tandem-link"}>
+                    <ListItemLink href="https://digicampus.fi/course/view.php?id=33" target="_blank"
+                                  className={"sidebar-item tandem-link"}>
                         <ListItemIcon>
                             <SchoolIcon/>
                         </ListItemIcon>
@@ -82,7 +87,7 @@ function SimpleList(props) {
             </List>
             <List component="nav">
                 <h3 className={"rooms-list__type " + classes.no_padding_bottom}>
-                    <ListItemLink href="/languagePreferences" className={"sidebar-item tandem-link"} >
+                    <ListItemLink href="/languagePreferences" className={"sidebar-item tandem-link"}>
                         <ListItemIcon>
                             <ListIcon/>
                         </ListItemIcon>

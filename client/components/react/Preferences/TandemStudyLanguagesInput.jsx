@@ -1,17 +1,19 @@
+import { t } from 'meteor/rocketchat:utils';
+import TandemLanguages from '../../../models/TandemLanguages';
+import {LanguageLevelsEnum} from "../../../../lib/helperData";
 import React from 'react';
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////	Material UI
 import PropTypes from 'prop-types';
 import { withStyles } from '@material-ui/core/styles';
 import MenuItem from '@material-ui/core/MenuItem';
 import FormControl from '@material-ui/core/FormControl';
 import Select from '@material-ui/core/Select';
 import Paper from '@material-ui/core/Paper';
+
 import { noLanguage, noLevel } from './TandemLanguageConstant'
-import TandemLanguages from '../../../models/TandemLanguages';
-
-import { t } from 'meteor/rocketchat:utils';
-import {LanguageLevelsEnum} from "../../../../lib/helperData";
 
 
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////	Styles
 
 const styles = theme => ({
     root: {
@@ -83,6 +85,8 @@ function getAllowedLevels(){
     const levels =  Object.keys(LanguageLevelsEnum);
     return levels.map(function (level) { return { _id: LanguageLevelsEnum[level], level: level } });
 }
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////    Class
 
 class StudyLanguagesInput extends React.Component {
     constructor(props) {
