@@ -10,17 +10,8 @@ import {checkCondition, getOtherOne} from "../../lib/checkerHelpers";
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////	Methods
 
 Meteor.methods({
-    unmatchRoom(rid, reason) {
-        checkInput(rid, reason);
-        checkUser(Meteor.userId());
-        const match = getMatch(rid, Meteor.userId());
-
-        //TandemLanguageMatches.hideMatch(match.languageMatch);
-        TandemUsersMatches.unmatchMatch(match._id, true);
-
-        sendEmailReport(Meteor.userId(), match, reason);
-        Meteor.call('executeLanguageMatching', Meteor.userId(), []);
-        return true;
+    getUserTopics(userId) {
+        return [];
     },
 });
 

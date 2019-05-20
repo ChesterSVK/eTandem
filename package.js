@@ -24,3 +24,22 @@ Package.onUse(function(api) {
 	api.mainModule('client/index.js', 'client');
 	api.mainModule('server/index.js', 'server');
 });
+
+Package.onTest(function (api) {
+	// api.use('rocketchat:tandem');
+
+    api.use([
+        // "babel-eslint",
+        // "babel-mocha-es6-compiler",
+    	'ecmascript',
+		'random',
+		'tinytest',
+		'meteortesting:mocha',
+	]);
+
+    // Add any files with mocha tests.
+    api.addFiles('tests/server/startup.tests.js');
+    api.addFiles('tests/client/startup.tests.js');
+    api.addFiles('tests/both/enum.tests.js');
+    api.addFiles('tests/both/checkers.tests.js');
+});

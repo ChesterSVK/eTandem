@@ -2,6 +2,7 @@ import { Meteor } from 'meteor/meteor';
 import { Rooms }  from 'meteor/rocketchat:models';
 import TandemUserLanguages  from '../models/TandemUserLanguages';
 import {TeachingMotivationEnum} from "../../lib/helperData";
+import {checkCondition, checkMotivation} from "../../lib/checkerHelpers";
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////	Methods
 
@@ -12,7 +13,7 @@ Meteor.methods({
      * @returns {boolean} true if user has some language preferences, false otherwise
      */
 	'tandemUserLanguages/hasSomePreferences'() {
-		checkUser(this.userId, 'tandemUserLanguages/hasSomePreferences');
+		checkCondition(this.userId, 'error-invalid-user', 'Invalid user', 'tandemUserLanguages/hasSomePreferences');
 		return TandemUserLanguages.findByUserId(this.userId).fetch().length > 0;
 	},
 
@@ -33,8 +34,9 @@ Meteor.methods({
      * @returns {boolean} if operation was successful
      */
 	'tandemUserLanguages/setPreferences'(lanugagePreferences, motivation) {
-		checkUser(this.userId, 'tandemUserLanguages/setPreferences');
-		checkMotivation(motivation);
+	    checkCondition(this.userId, 'error-invalid-user', 'Invalid user', {method: 'tandemUserLanguages/setPreferences'});
+		checkMotivation(motivation, {method: 'tandemUserLanguages/setPreferences'});
+
 		setLanguagePreference(lanugagePreferences, motivation);
 		Meteor.call('executeLanguageMatching',
             Meteor.userId(),
@@ -44,24 +46,6 @@ Meteor.methods({
 });
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////	Private functions
-
-//////////////////////////////////////////////////////////////////////////////////////////////////	Validity functions
-
-function checkUser(userId, method) {
-    if (!userId){
-        throw new Meteor.Error('error-invalid-user', 'Invalid user', {
-            method: method,
-        });
-    }
-}
-
-function checkMotivation(motivation) {
-    if (!(motivation === TeachingMotivationEnum.WTLEARN || motivation === TeachingMotivationEnum.WTTEACH)){
-        throw new Meteor.Error('error-invalid-motivation', 'Invalid motivation: ' + motivation, {
-            method: 'tandemUserLanguages/setPreferences',
-        });
-    }
-}
 
 //////////////////////////////////////////////////////////////////////////////////////////////////
 

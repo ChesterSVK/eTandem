@@ -161,62 +161,20 @@
     line-height: 150%;
 }
 
-/***********************************************************************************************************************	Translation Bubble*/
-/*.tandem-translated-message{*/
-    /*!*display: none;*!*/
-/*}*/
-/*.tandem-translated-message .tandem-message-translation-buttons{*/
-    /*display: inline-block;*/
-    /*margin-left: 1em;*/
-/*}*/
-/*.tandem-translated-message .tandem-message-translation-buttons .translate-to-language-btn{*/
-    /*display: inline-block;*/
-    /*border: 1px solid #b1b1b1;*/
-    /*background: #c9c9c9;*/
-    /*padding: 0.5em;*/
-    /*border-radius: 0.4em;*/
-    /*cursor: pointer;*/
-/*}*/
-/*.tandem-translated-message .tandem-message-translation-buttons .translate-to-language-btn:hover{*/
-    /*background: #b1b1b1;*/
-/*}*/
-/*.tandem-translated-message .tandem-message-translated{*/
-    /*display: inline-block;*/
-    /*min-width: 20vh;*/
-    /*max-width: 500px;*/
-    /*box-shadow: 2px 3px 6px -3px rgba(0,0,0,0.5);*/
-/*}*/
-/*.tandem-translated-message .translation-bubble {*/
-    /*position: relative;*/
-    /*background: #f0f0f0;*/
-    /*border-radius: .4em;*/
-    /*border: 1px solid #c9c9c9;*/
-    /*padding: 0.5em 1em;*/
-    /*margin-top: 17px;*/
-/*}*/
 
-/*.tandem-translated-message .tandem-message-translated .message-close{*/
-    /*display: inline-block;*/
-    /*position: absolute;*/
-    /*right: 6px;*/
-    /*top: 2px;*/
-/*}*/
-/*.tandem-translated-message .tandem-message-translated .message-close:hover{*/
-    /*background: rgba(0,0,0,0.1);*/
-    /*cursor: pointer;*/
-/*}*/
-
-/*.tandem-translated-message .translation-bubble:after {*/
-    /*content: '';*/
-    /*position: absolute;*/
-    /*top: 0;*/
-    /*left: 10%;*/
-    /*width: 0;*/
-    /*height: 0;*/
-    /*border: 14px solid transparent;*/
-    /*border-bottom-color: #c9c9c9;*/
-    /*border-top: 0;*/
-    /*border-left: 0;*/
-    /*margin-left: -7px;*/
-    /*margin-top: -14px;*/
-/*}*/
+@media only screen and (max-width: 500px) {
+    .tandem-list-matches-content .card{
+        display: block;
+        height: auto;
+        max-width: 250px;
+    }
+    .tandem-list-matches-content .card .cardData{
+        display: block;
+    }
+    .tandem-list-matches-content .card .cardData .cardAvatar,
+    .tandem-list-matches-content .card .cardData .cardContent{
+        display: block;
+        width: 100%;
+        height: auto;
+    }
+}

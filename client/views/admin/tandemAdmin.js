@@ -237,18 +237,3 @@ Template.tandemAdmin.events({
         );
     }
 });
-
-const prevent = function prevent(fn, ...args) {
-    return function (e, {instance}) {
-        e.stopPropagation();
-        e.preventDefault();
-        return fn.apply(instance, args);
-    };
-};
-
-const getUser = function getUser(fn, ...args) {
-    if (!user) {
-        return;
-    }
-    return fn.apply(this, [user, ...args]);
-};

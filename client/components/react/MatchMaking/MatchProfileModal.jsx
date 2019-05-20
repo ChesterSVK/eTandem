@@ -34,13 +34,16 @@ const styles = ({
     avatarHolder: {
         maxWidth: "320px",
         margin: "auto",
+        position: "relative"
     },
     dialogUserName: {
-        opacity: 0.6,
+        opacity: 0.85,
         textAlign: "center",
         padding: "0.3em 1.3em",
-        marginTop: "-1.8em",
-        position: "relative",
+        position: "absolute",
+        "bottom" : 0,
+        "right" : 0,
+        "left" : 0
     },
     listItem: {
         paddingTop: 16,
@@ -136,7 +139,7 @@ class MatchProfileModal extends React.Component {
                         <Blaze template="avatar"
                                username={props.match.teacher.username}/>
                         <Typography variant="h4"
-                                    className={classes.dialogUserName  + " sidebar__header-status-bullet--" + props.match.teacher.status}>
+                                    className={classes.dialogUserName + " sidebar__header-status-bullet--" + props.match.teacher.status}>
                             {this.props.match.teacher.name}
                         </Typography>
                     </div>
@@ -166,6 +169,18 @@ class MatchProfileModal extends React.Component {
                                             props.match.matchingLanguage)
                                     }/>
                             </div>
+                        </ListItem>
+                        <ListItem className={classes.listItem}>
+                            {props.match.teacherTopics.length ?
+                                <div>
+                                    <ListItemText secondary={t("preferred_topics")}/>
+                                    <ListItemText
+                                        primary={
+                                            props.match.teacherTopics
+                                        }/>
+                                </div>
+                                :
+                                ""}
                         </ListItem>
                     </List>
                 </DialogContent>

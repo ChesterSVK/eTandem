@@ -57,6 +57,8 @@
   "error-invalid-motivation": "Invalid motiovation provided",
   "error-invalid-reason" : "Invalid reason",
   "error-invalid-report" : "U can't report yourself",
+  "error-invalid-topics" : "Invalid user topics",
+  "error-setting-topics" : "Error setting user topics",
   "error-sending-email" : "Error sending email",
   "error-receiving-request": "Error receiving request",
   "error-too-many-preferences": "Too many preferneces. Limit is 5",
@@ -88,5 +90,9 @@
   "tandem_request_accept": "Accept",
   "tandem_request_decline": "Decline",
   "tandem_room_topic": "Match between language __lang1__ and __lang2__",
-  "teaches": "Teaches"
+  "teaches": "Teaches",
+  "Topics_set_successfully" : "Topics set successfully",
+  "Tell_us_about_your_interests": "Tell us about your interests",
+  "Add_Topic": "Add Topic",
+  "preferred_topics" : "Preferred topics:"
 }

@@ -13,6 +13,7 @@ import './methods/reportUserInRoom';
 import './methods/executeLanguageMatching';
 import './methods/reloadLanguageMatching';
 import './methods/tandemSendEmail';
+import './methods/tandemUserTopics';
 // Publications
 import './publications/tandemUserLanguages';
 import './publications/tandemLanguages';

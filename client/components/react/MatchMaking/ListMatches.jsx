@@ -42,7 +42,7 @@ const styles = theme => ({
         marginLeft: 8,
         marginRight: 8,
         marginTop: 4,
-        background: "linear-gradient(90deg, rgba(255,210,31,1) 0%, rgba(255,255,255,0) 7%)"
+
     },
     cardCompleted: {
         display: 'flex',
@@ -50,7 +50,7 @@ const styles = theme => ({
         marginLeft: 8,
         marginRight: 8,
         marginTop: 4,
-        background: "linear-gradient(90deg, rgba(45,224,165,1) 0%, rgba(255,255,255,0) 7%)"
+
     },
     cardAccepted: {
         display: 'flex',
@@ -58,7 +58,7 @@ const styles = theme => ({
         marginLeft: 8,
         marginRight: 8,
         marginTop: 4,
-        background: "linear-gradient(90deg, rgba(23,92,196,1) 0%, rgba(255,255,255,0) 7%)"
+
     },
     details: {
         display: 'flex',
@@ -132,7 +132,7 @@ class ListMatches extends React.Component {
                 {matches.map((tile, index) => (
                     <div className={this.classes.listOfLanguageFriends}
                          key={tile.matchingLanguage + '_' + tile.symetricLanguage}>
-                        <Card className={this.classes.cardAccepted}>
+                        <Card className={this.classes.cardAccepted + ' card'}>
                             {
                                 this.getTileData(tile)
                             }
@@ -144,12 +144,12 @@ class ListMatches extends React.Component {
 
     getTileData(tile) {
         return (<div>
-            <div className={this.classes.details}>
-                <div className={this.classes.tileDataAvatar}>
+            <div className={this.classes.details  + ' cardData'}>
+                <div className={this.classes.tileDataAvatar + ' cardAvatar'}>
                     <Blaze template="avatar"
                            username={this.getOtherUserUsername(tile)}/>
                 </div>
-                <CardContent className={this.classes.content}>
+                <CardContent className={this.classes.content + ' cardContent'}>
                     <Typography component="h6" variant="h6">
                         {this.getOtherUserUsername(tile)}
                     </Typography>
@@ -168,7 +168,7 @@ class ListMatches extends React.Component {
 
     render() {
         return (
-            <div>
+            <div className={'tandem-list-matches-content'}>
                 {this.getGeneralRender(
                     this.state.userMatches.filter(match => match.status === MatchingRequestStateEnum.ACCEPTED),
                     t("My_Students")

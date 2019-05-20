@@ -94,9 +94,12 @@ function getOtherUserId(userIds, actualUserId) {
 function addFittingLanguageMatches(actualUserId, languageMatches, matchingResult) {
 
     matchingResult.matches = languageMatches.map(function (item) {
+        const otherUserId = getOtherUserId(item.usersInMatch, actualUserId);
+        const topics = getUserPreference(otherUserId, 'userTopics');
         return {
             _id: item._id,
-            teacher: Users.findOneById(getOtherUserId(item.usersInMatch, actualUserId)),
+            teacher: Users.findOneById(otherUserId),
+            teacherTopics: topics === undefined ? [] : topics,
             matchingLanguage: matchingResult.languageName,
             languagesInMatch: item.languagesInMatch.map(function (lang) {
                 return TandemLanguages.findOneById(lang).name;

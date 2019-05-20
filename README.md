@@ -9,14 +9,20 @@ This is the first base version of the whole project and project will be extended
 Tandem Package was designed so no rocketchat code and packagaes are not depended on this package. Keep that in mind. 
 
 # Testing
+- after completing all steps in `RocketchatTandemInstall.md` you can execute tests of the package.
 
-Todo
+- Command: 
+`$ TEST_MODE=true meteor --full-app test-packages --driver-package hubroedu:mocha rocketchat:tandem -p 3100`
+- URL: 
+`http://suikero.tech:3100/`
 
 # Developers
 > #### Back-end: 
 > [Jozef Cibík](https://github.com/ChesterSVK)
 > #### Front-end: 
 > [Mikaela Linfdors](https://github.com/Mikaela-Henrietta), [Nam Nguyen](https://github.com/munnie), [Lal Gurung](https://github.com/t1gula00), [Jozef Cibík](https://github.com/ChesterSVK),
+> #### Test base: 
+> [Jozef Cibík](https://github.com/ChesterSVK)
 > #### Documentation: 
 > [Jozef Cibík](https://github.com/ChesterSVK), [Aleksis Katiskoski](https://github.com/Suikero)
 > #### File Structure: 

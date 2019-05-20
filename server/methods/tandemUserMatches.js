@@ -6,6 +6,7 @@ import TandemLanguageMatches from '../models/TandemLanguageMatches';
 import {Roles, Rooms, Users, Messages} from 'meteor/rocketchat:models';
 import { t } from 'meteor/rocketchat:utils';
 import {MatchingRequestStateEnum} from "../../lib/helperData";
+import {checkCondition, getOtherOne} from "../../lib/checkerHelpers";
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////	Methods
 
@@ -30,27 +31,14 @@ Meteor.methods({
      * @returns {*} userMatch
      */
 	'tandemUserMatches/getMatchingRequest'(roomId) {
-		if (!this.userId) {
-			return false;
-		}
-		if (roomId == null || roomId === undefined) {
-			return false;
-		}
-		check(roomId, String);
+        checkCondition(this.userId, 'error-invalid-user', 'Invalid user', {method: 'tandemUserMatches/showTeacherRequest'});
+        checkCondition(roomId, 'error-invalid-room', 'Invalid room', {method: 'tandemUserMatches/showTeacherRequest'});
 
 		const room = Rooms.findOneById(roomId);
-		if (room == null) {
-			throw new Meteor.Error('error-invalid-room', 'Invalid room', {
-				method: 'tandemUserMatches/showTeacherRequest',
-			});
-		}
+		checkCondition(room, 'error-invalid-room', 'Invalid room', {method: 'tandemUserMatches/showTeacherRequest'});
 
 		const userMatch = TandemUsersMatches.findOneByRoomId(roomId);
-		if (userMatch == null) {
-			throw new Meteor.Error('error-invalid-match', 'Invalid match', {
-				method: 'tandemUserMatches/showTeacherRequest',
-			});
-		}
+		checkCondition(userMatch,'error-invalid-match', 'Invalid match', {method: 'tandemUserMatches/showTeacherRequest'});
 
 		return userMatch;
 	},
@@ -104,13 +92,11 @@ Meteor.methods({
 
 	'tandemUserMatches/createMatchingRequest'(match) {
 		const user = Meteor.user();
-        checkUser(user._id, 'tandemUserMatches/createMatchingRequest');
-
-
+		checkCondition(user._id, 'error-invalid-user', 'Invalid user', {method: 'tandemUserMatches/createMatchingRequest'});
         checkUserLanguageMatch(match);
 
         const matchingLanguage = match.matchingLanguage;
-        const symmetricLanguage = getSymetricLanguage(match.languagesInMatch, matchingLanguage);
+        const symmetricLanguage = getOtherOne(match.languagesInMatch, matchingLanguage);
         const name = '[' + matchingLanguage + '] ' + match.teacher.username
             + ' - '
             + user.username + ' [' + symmetricLanguage + ']';
@@ -130,8 +116,8 @@ Meteor.methods({
      * @returns {*} transformed user matches
      */
 	'tandemUserMatches/transform' (userMatches) {
-        checkUser(this.userId, 'tandemUserMatches/createMatchingRequest');
-        checkUserMatches(userMatches);
+        checkCondition(this.userId, 'error-invalid-user', 'Invalid user', 'tandemUserMatches/createMatchingRequest');
+        checkCondition(userMatches, 'error-invalid-match', 'Invalid match', {method: 'tandemUserMatches/createMatchingRequest'});
 		return userMatches.map(function (match) {
 			return getMatchObject(match);
 		});
@@ -143,7 +129,7 @@ Meteor.methods({
      * @returns {*}
      */
 	'tandemUserMatches/getAllMatches'() {
-        checkUser(this.userId, 'tandemUserMatches/getAllMatches');
+		checkCondition(this.userId, 'error-invalid-user', 'Invalid user', 'tandemUserMatches/getAllMatches');
 
 		const query = {
 			users: this.userId,
@@ -180,25 +166,7 @@ function checkUserLanguageMatch(userLanguageMatch) {
     }
 }
 
-function checkUser(userId, method){
-    if (!userId) {
-        throw new Meteor.Error(
-            'error-invalid-user', 'Invalid user', {method: method});
-    }
-}
-
-function checkRoom(roomId) {
-    if (roomId === undefined) {
-        throw new Meteor.Error(
-            'error-invalid-userLanguageMatch', 'Invalid userLanguageMatch', {method: 'tandemUserMatches/createMatchingRequest'});
-    }
-}
-
 //////////////////////////////////////////////////////////////////////////////////////////////////	Getters
-
-function getSymetricLanguage(matchingLangs, matchingLang) {
-    return matchingLangs[0] === matchingLang ? matchingLangs[1] : matchingLangs[0];
-}
 
 /**
  * Transforms user match data
@@ -217,42 +185,19 @@ function getMatchObject(match) {
 	};
 }
 
-/**
- * Returns the other language from the languages array of length 2
- * @param languages array
- * @param matchingLang
- * @returns {*}
- */
-function getSymetricLang(languages, matchingLang){
-    if (languages.length === 2){
-        if (languages[0] === matchingLang){
-            return languages[1];
-        }
-        if (languages[1] === matchingLang){
-            return languages[0];
-        }
-    }
-    return false;
-}
-
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 function createRoom(name, members, readOnly = false, customFields = {}, extraData = {}){
     check(members, Match.Optional([String]));
-
-    if (!Meteor.userId()) {
-        throw new Meteor.Error('error-invalid-user', 'Invalid user', { method: 'createPrivateGroup' });
-    }
-
-    if (!RocketChat.authz.hasPermission(Meteor.userId(), 'create-p')) {
-        throw new Meteor.Error('error-not-allowed', 'Not allowed', { method: 'createPrivateGroup' });
-    }
+    checkCondition(Meteor.userId(), 'error-invalid-user', 'Invalid user', { method: 'createPrivateGroup' });
+    checkCondition(RocketChat.authz.hasPermission(Meteor.userId(), 'create-p'),
+        'error-not-allowed', 'Not allowed', { method: 'createPrivateGroup' });
 
     return RocketChat.createRoom('p', name, Meteor.user() && Meteor.user().username, members, readOnly, { customFields, ...extraData });
 }
 
 function createRequest(user, userLanguageMatch, roomId){
-    checkRoom(roomId);
+    checkCondition(roomId, 'error-invalid-userLanguageMatch', 'Invalid userLanguageMatch', {method: 'tandemUserMatches/createMatchingRequest'});
 
     createWelcomeMessageInRoom(roomId, userLanguageMatch, user);
     TandemLanguageMatches.hideMatch(userLanguageMatch._id);
@@ -272,7 +217,7 @@ function createWelcomeMessageInRoom(roomId, userLanguageMatch, user) {
         t("get_request_welcome_message",
             {
                 lang1: userLanguageMatch.matchingLanguage,
-                lang2: getSymetricLang(userLanguageMatch.languagesInMatch, userLanguageMatch.matchingLanguage)
+                lang2: getOtherOne(userLanguageMatch.languagesInMatch, userLanguageMatch.matchingLanguage)
             }),
         user, {});
 }
@@ -282,7 +227,7 @@ function createUserMatch(userId, roomId, userLanguageMatch) {
     const matchingLangId = TandemLanguages
         .findOneByLangName(userLanguageMatch.matchingLanguage)._id;
     const symetricLangId = TandemLanguages
-        .findOneByLangName(getSymetricLang(userLanguageMatch.languagesInMatch, userLanguageMatch.matchingLanguage))._id;
+        .findOneByLangName(getOtherOne(userLanguageMatch.languagesInMatch, userLanguageMatch.matchingLanguage))._id;
 
     TandemUsersMatches.createUserMatchByLanguageMatch(
     	userId,
@@ -290,11 +235,4 @@ function createUserMatch(userId, roomId, userLanguageMatch) {
 		[userId, userLanguageMatch.teacher._id],
 		roomId, matchingLangId, symetricLangId
 	);
-}
-
-function checkUserMatches(userMatches) {
-    if (userMatches === undefined || !Array.isArray(userMatches)) {
-        throw new Meteor.Error(
-            'error-invalid-match', 'Invalid match', {method: 'tandemUserMatches/createMatchingRequest'});
-    }
 }

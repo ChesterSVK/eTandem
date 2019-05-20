@@ -6,7 +6,7 @@ import TandemUserLanguages from '../models/TandemUserLanguages'
 import TandemUsersMatches from '../models/TandemUsersMatches'
 import TandemLanguageMatches from '../models/TandemLanguageMatches'
 import {TeachingMotivationEnum, LanguageLevelsEnum, MatchingRequestStateEnum} from "../../lib/helperData";
-
+import { negateMotivation } from '../../lib/checkerHelpers'
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////	Methods
 
 Meteor.methods({
@@ -66,20 +66,6 @@ function findLanguagePreferenceMatch(userId, preference) {
         preference.langId,
         getLanguageLevels(preference.levelId, preference.motivation)
     ).fetch();
-}
-
-/**
- * Negates the motivation for languages
- * @param motivation to negate
- * @returns {string} opposite motivation
- */
-function negateMotivation(motivation) {
-	if (motivation === TeachingMotivationEnum.WTLEARN) {
-		return TeachingMotivationEnum.WTTEACH;
-	}
-	if (motivation === TeachingMotivationEnum.WTTEACH) {
-		return TeachingMotivationEnum.WTLEARN;
-	}
 }
 
 /**

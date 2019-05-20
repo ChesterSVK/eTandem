@@ -1,20 +1,54 @@
 
 #Tandem Integration guide for the Rocketchat version 0.74
 
+Estimated install time: 60min
+
 # 1. Download stable version
 
-$ git clone https://github.com/RocketChat/Rocket.Chat.git
-$ git checkout 0.74.3
-$ cd Rocket.Chat
-$ example-build.sh (Will fail on the first time, but downloads additional packages)
+`$ git clone https://github.com/RocketChat/Rocket.Chat.git`
+
+`$ git checkout 0.74.3`
+
+`$ cd Rocket.Chat`
+
+`$ example-build.sh` 
+(Will fail on the first time, but downloads additional packages)
 
 # 2. Setup important environment variables and data
 
-Todo
+Skipped
 
 # 3. Prepare mongo database
 
-Todo
+UniTandem MongoDB install and configuration in Linux Ubuntu
+
+1 Install MongoDB by running the following command without the apostrophes: "sudo apt-get install -y mongodb-org
+2 Enable and start MongoDB service: "sudo systemctl enable mongod && sudo systemctl start mongod"
+3 Configure replica set for MongoDB: "echo -e "replication:\n  replSetName: \"rs01\"" | sudo tee -a /etc/mongod.conf"
+4 Restart MongoDB service: "sudo systemctl restart mongod"
+5 Start MongoDB shell and initiate the replica set: "mongo" and after that "rs.initiate()"
+	Output should look something like this: 
+	{
+    "info2" : "no configuration specified. Using a default configuration for the set",
+    "me" : "127.0.0.1:27017",
+    "ok" : 1,
+    "operationTime" : Timestamp(1538772048, 1),
+    "$clusterTime" : {
+        "clusterTime" : Timestamp(1538772048, 1),
+        "signature" : {
+            "hash" : BinData(0,"AAAAAAAAAAAAAAAAAAAAAAAAAAA="),
+            "keyId" : NumberLong(0)
+        }
+    }
+	}
+	rs01:SECONDARY>
+
+	Ok value should be 1, otherwise something is wrong.
+	If the ok values is 1, press enter and the prompt should turn into rs01:PRIMARY>
+	which means that replica set is being used. 
+6 Type exit to exit the mongoDB shell: "exit"
+7 Add the MONGO_OPLOG_URL enviroment variable to the config file or to the service definition. 
+	IE like this: MONGO_OPLOG_URL=mongodb://localhost:27017/local?replSet=rs01 \
 
 # 4. Create development run script eTandem-build.sh, to be able to do reactive and quick changes to the running instance
     
@@ -215,7 +249,7 @@ meteor npm start
 >Copy File: `packages/rocketchat-tandem/copies/client_routes_router/router.js` to `client/routes/router.js` 
 
 >##Tandem sidebar section, with click event 
->File: `packages/rocketchat-sidenav/client/sideNav.html`
+>File: `packages/rocketchat-ui-sidenav/client/sideNav.html`
 ```
 <!--Tandem-->
 <div class="tandem-links">
@@ -335,51 +369,47 @@ meteor npm start
 ...
 // Tandem
 export async function unmatch(type, rid) {
-	modal.open({
-		title: t('Are_you_sure'),
-		text: t('Delete_Room_Warning'),
-		type: 'warning',
-		showCancelButton: true,
-		confirmButtonColor: '#DD6B55',
-		confirmButtonText: t('Yes_delete_it'),
-		cancelButtonText: t('Cancel'),
-		closeOnConfirm: false,
-		html: false,
-	}, async function(isConfirm) {
-		if (!isConfirm) {
-			return;
-		}
-		try {
-			await call('eraseRoom', rid);
-		} catch (error) {
-			return modal.open({
-				type: 'error',
-				title: t('Warning'),
-				text: handleError(error, false),
-				html: false,
-			});
-		}
-		try {
-			await call('unmatchRoom', rid);
-			modal.open({
-				title: t('Deleted'),
-				text: t('Room_has_been_deleted'),
-				type: 'success',
-				showConfirmButton: true,
-				confirmButtonText: t('OK'),
-			}, function () {
-				document.location.reload(true);
-			});
-		} catch (error) {
-			return modal.open({
-				type: 'error',
-				title: t('Warning'),
-				text: handleError(error, false),
-				html: false,
-			});
-		}
+    modal.open({
+        title: t('Are_you_sure'),
+        text: t('Unmatching_Room_Warning'),
+        type: 'input',
+        inputType: 'textarea',
+        showCancelButton: true,
+        confirmButtonColor: '#DD6B55',
+        confirmButtonText: t('Yes_delete_it'),
+        cancelButtonText: t('Cancel'),
+        closeOnConfirm: false,
+        html: false,
+    }, async function(reason) {
+        if (!reason) {
+            return;
+        }
 
-	});
+        try {
+                    await call('eraseRoom', rid);
+                    await call('unmatchRoom', rid, reason);
+                    modal.open({
+                        title: t('Deleted'),
+                        text: t('Room_has_been_deleted'),
+                        type: 'success',
+                        showConfirmButton: true,
+                        confirmButtonText: t('OK'),
+                    }, function () {
+                        FlowRouter.go('/home');
+                        document.location.reload(true);
+                    });
+                } catch (error) {
+                    return modal.open({
+                        type: 'error',
+                        title: t('Warning'),
+                        text: handleError(error, false),
+                        html: false,
+                    }, function () {
+                        FlowRouter.go('/home');
+                        document.location.reload(true);
+                    });
+                }
+    });
 }
 
 ...
@@ -418,7 +448,7 @@ import {hasAllPermission, hasRole} from 'meteor/rocketchat:authorization';
 //Add to action functions array 
 
 // Tandem
-		, () => {
+		() => {
 			if (!canReportUser()) {
 				return;
 			}
@@ -457,7 +487,7 @@ import {hasAllPermission, hasRole} from 'meteor/rocketchat:authorization';
 					);
 				}),
 			};
-		}
+		},
 
 ```
 >>method defined in tandem-package/server/methods/reportUserInRoom.js
@@ -491,7 +521,7 @@ import {hasAllPermission, hasRole} from 'meteor/rocketchat:authorization';
 >>File: `packages\rocketchat-ui\client\views\app\room.html`
 >>
 ```
-header
+//after header
 ...
 
 {{> tandemMatchingRequest roomId=getRoomId}}
@@ -502,7 +532,7 @@ message section
 >>File: `packages\rocketchat-ui\client\views\app\room.js`
 >>
 ```
-// Tandem
+// Tandem , in helpers
 	getRoomId(){
 		return this._id
 	},
@@ -514,6 +544,7 @@ message section
 >>File: `packages\rocketchat-channel-settings\client\views\channelSettings.js`
 >>
 ```
+//Tandem replace canLeaveRoom
     canLeaveRoom() {
 		const { cl: canLeave, t: roomType } = Template.instance().room;
 		if (roomType === 'c'){
@@ -526,7 +557,7 @@ message section
 	},
 ``` 
 
->##Commented / Deleted out channel description, hide button and announcements
+>##Commented / Deleted out channel settings.description, hide button and settings.announcements, and labels about annoucement and description
 >>File: `packages\rocketchat-channel-settings\client\views\channelSettings.html`
 
 >##Added umatch posibility
@@ -540,7 +571,7 @@ message section
 >>File: `packages\rocketchat-channel-settings\client\views\channelSettings.js`
 >>
 ```
-import { modal, popover, call, erase, hide, leave, unmatch } from 'meteor/rocketchat:ui-utils';
+import { call, erase, hide, leave, unmatch } from 'meteor/rocketchat:ui-utils';
 import { hasPermission, hasAtLeastOnePermission } from 'meteor/rocketchat:authorization';
 ...
 
@@ -561,7 +592,7 @@ import { hasPermission, hasAtLeastOnePermission } from 'meteor/rocketchat:author
     	....
     	
     	
-    	//Tandem
+    	//Tandem in ChannelSettings events
             'click .js-unmatch'(e, instance) {
                 const { t: type } = instance.room;
                 const rid = instance.room._id;
@@ -570,7 +601,8 @@ import { hasPermission, hasAtLeastOnePermission } from 'meteor/rocketchat:author
 ``` 
 
 >>File: `packages\rocketchat-ui-utils\client\index.js`
->>
+
+>>Replace line with 
 `export { erase, hide, leave, unmatch } from './lib/ChannelActions';`
 
 >>File:  `packages\rocketchat-ui-utils\client\lib\ChannelActions.js`
@@ -594,38 +626,31 @@ export async function unmatch(type, rid) {
         }
 
         try {
-            await call('eraseRoom', rid);
-        } catch (error) {
-            return modal.open({
-                type: 'error',
-                title: t('Warning'),
-                text: handleError(error, false),
-                html: false,
-            });
-        }
-        try {
-            await call('unmatchRoom', rid, reason);
-            modal.open({
-                title: t('Deleted'),
-                text: t('Room_has_been_deleted'),
-                type: 'success',
-                showConfirmButton: true,
-                confirmButtonText: t('OK'),
-            }, function () {
-                document.location.reload(true);
-            });
-        } catch (error) {
-            return modal.open({
-                type: 'error',
-                title: t('Warning'),
-                text: handleError(error, false),
-                html: false,
-            });
-        }
-
+                    await call('eraseRoom', rid);
+                    await call('unmatchRoom', rid, reason);
+                    modal.open({
+                        title: t('Deleted'),
+                        text: t('Room_has_been_deleted'),
+                        type: 'success',
+                        showConfirmButton: true,
+                        confirmButtonText: t('OK'),
+                    }, function () {
+                        FlowRouter.go('/home');
+                        document.location.reload(true);
+                    });
+                } catch (error) {
+                    return modal.open({
+                        type: 'error',
+                        title: t('Warning'),
+                        text: handleError(error, false),
+                        html: false,
+                    }, function () {
+                        FlowRouter.go('/home');
+                        document.location.reload(true);
+                    });
+                }
     });
 }
-
 ```
 
 
@@ -633,7 +658,7 @@ export async function unmatch(type, rid) {
 >>File: `packages\rocketchat-ui-sidenav\client\sidebarHeader.js`
 >>
 ```
-import {hasAllPermission, hasRole} from 'meteor/rocketchat:authorization';
+import {hasAllPermission, hasRole, hasAtLeastOnePermission} from 'meteor/rocketchat:authorization';
 ...
 {
 	name: t('Create_A_New_Channel'),
@@ -648,7 +673,8 @@ import {hasAllPermission, hasRole} from 'meteor/rocketchat:authorization';
 
 >##Added sentence about yourself
 >>File: `packages\rocketchat-ui-account\client\accountProfile.html`
->>
+
+>>After avatar div
 ```
 <!--Tandem-->
 							{{# with canChange=allowSentenceChange}}
@@ -656,7 +682,7 @@ import {hasAllPermission, hasRole} from 'meteor/rocketchat:authorization';
 									<label class="rc-input__label">
 										<div class="rc-input__title">{{_ "Sentence_about_yourself"}}</div>
 										<div class="rc-input__wrapper">
-											<input type="text" data-customfield="true" class="rc-input__element" name="sentence" id="sentence" placeholder="{{_ "Tell_us_about_yourself" }}" value="{{sentence}}" {{ifThenElse canChange '' 'disabled'}}>
+											<input type="text" data-customfield="true" class="rc-input__element" name="tandemSentence" id="tandemSentence" placeholder="{{_ "Tell_us_about_yourself" }}" value="{{sentence}}" {{ifThenElse canChange '' 'disabled'}}>
 										</div>
 									</label>
 									{{# unless canChange}}
@@ -685,13 +711,100 @@ const validateSentence = (sentence) => sentence && sentence.length;
     	
     // Tandem
     allowSentenceChange() {
-    	return Rocketchat.settings.get('Accounts_CustomFields');
+    	return RocketChat.settings.get('Accounts_CustomFields');
     },
     
     
     //Tandem (On created)
     self.sentence = new ReactiveVar(user.customFields && user.customFields['tandemSentence'] !== undefined ? user.customFields['tandemSentence'] : "");
 ```
+
+
+
+>##Added preferred topic field
+>>File: `packages\rocketchat-ui-account\client\accountProfile.html`
+
+>>After sentence about yourself
+```
+<!--Tandem-->
+                        {{# with canChange=allowTopicChange}}
+                            <div class="rc-input rc-w100 padded" style="padding: 15px;">
+                                <label for="roles">{{_ "Topics"}}</label>
+                                <div class="rc-form-group rc-form-group--small">
+                                    <ul id="roles" class="chip-container current-user-roles">
+                                        {{#each userTopics}}
+                                            <li class="remove-topic" title="{{this}}"><i class="icon icon-cancel-circled"></i>{{this}}</li>
+                                        {{/each}}
+                                    </ul>
+                                </div>
+
+                                <label for="roleSelect">{{_ "Add_Topic"}}</label>
+                                <div class="rc-form-group rc-form-group--small rc-form-group--inline">
+                                    <input type="text" data-customfield="true" maxlength="20" class="rc-input__element" name="userTopic" id="userTopic" placeholder="{{_ "Tell_us_about_your_interests" }}" value="">
+                                    <button id="addTopic" class="rc-button rc-button--primary rc-form-item-inline">{{_ 'Add_Topic'}}</button>
+                                </div>
+                            </div>
+                        {{/with}}
+```
+>>File: `packages\rocketchat-ui-account\client\accountProfile.js`
+>>
+```
+//Tandem - in helpers
+
+    userTopics() {
+        return Template.instance().topics.get();
+    },
+
+//Tandem - in events
+
+	'click .remove-topic'(e,i){
+        e.stopPropagation();
+        e.preventDefault();
+        let topics = i.topics.get();
+        topics = topics.filter((el) => el !== this.valueOf());
+        i.topics.set(topics);
+        $(`[title=${ this }]`).remove();
+        Meteor.call('saveUserPreferences', {userTopics : topics}, function(err) {
+            if (err) {
+                toastr.error(t('error-setting-topics'));
+            } else {
+                toastr.success(t('Topics_set_successfully'));
+            }});
+	},
+    'click #addTopic'(e,i){
+        e.stopPropagation();
+        e.preventDefault();
+        if (!($('#userTopic').val())) {
+            return;
+        }
+        const userTopics = [...i.topics.get()];
+        userTopics.push($('#userTopic').val());
+        i.topics.set(userTopics);
+        $('#userTopic').val($('#userTopic').attr('placeholder'));
+        Meteor.call('saveUserPreferences', {userTopics : userTopics}, function(err) {
+            if (err) {
+                toastr.error(t('error-setting-topics'));
+            } else {
+                toastr.success(t('Topics_set_successfully'));
+            }});
+    }, 
+
+//Tandem - onCreated
+
+self.topics = new ReactiveVar([]);
+
+    self.getTopics = function() {
+        self.topics.set([]);
+        Meteor.call('getUserTopics', user._id, function(error, topics) {
+            self.topics.set(topics);
+        });
+    };
+    self.getTopics();
+
+```
+
+
+
 >>###Admin - Administration/Accounts/Registration/CustomFields
 >>
 ```
@@ -729,8 +842,8 @@ Migrations.add({
 
 >#---------------------------------------
 
->##Added UniTandem Adnimistration
->>File: `packages\rocketchat-ui-admin\client\adnimFlex.html`
+>##Added UniTandem Administration
+>>File: `packages\rocketchat-ui-admin\client\adminFlex.html`
 >>
 ```
 <!--Tandem-->
@@ -739,10 +852,21 @@ Migrations.add({
 {{/if}}
 ```
 
->##Delete original 404 page
+>##Delete original 404 page locally and on the server as well (if changes are uploaded to remote server)
 >>Delete File: `client\routes\pageNotFound.html`
 
+>#Auto Translations
+>See [Rocketchat Documentation](https://rocket.chat/docs/administrator-guides/google-cloud/auto-translate/)
 
+>#Test package
+>###Install mocha
+>`$ meteor add hubroedu:mocha`
+>###Install chai
+>`meteor npm install --save-dev chai`
+>###Execute tests
+>`$ TEST_MODE=true meteor --full-app test-packages --driver-package hubroedu:mocha rocketchat:tandem -p 3100`
+>###Access from
+>`http://suikero.tech:3100/`
 
 # 9. Reports and bugs
 >Voice recording not working due to import issues / js error not sure

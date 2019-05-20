@@ -4,6 +4,7 @@ import {Rooms, Subscriptions, Users, Messages} from 'meteor/rocketchat:models';
 import {hasPermission} from 'meteor/rocketchat:authorization';
 import TandemUsersMatches from '../models/TandemUsersMatches';
 import {TandemFeedbackMails} from "../../lib/feedbackMails";
+import {checkCondition} from "../../lib/checkerHelpers";
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////	Methods
 
@@ -16,13 +17,14 @@ Meteor.methods({
      */
     reportUserInRoom(data) {
         checkInput(data);
-        checkReason(data);
-        const fromId = checkUser(Meteor.userId());
+        checkCondition(data.reason, 'error-invalid-reason', 'Reason not provided', {method: 'reportUserInRoom'});
+        checkCondition(Meteor.userId(), 'error-invalid-user', 'Invalid user', {method: 'reportUserInRoom'});
+        const fromId = Meteor.userId();
         checkUsersPermissions(fromId, data);
         checkRoom(data);
         checkSubscription(data);
         const reportedUser = getReportedUser(data, fromId);
-        const match = checkMatch(data, fromId);
+        const match = getMatch(data, fromId);
         reportUsersInMatch(data, fromId, reportedUser._id, match);
         sendEmailReport(data, fromId, reportedUser._id);
         return true;
@@ -46,29 +48,6 @@ function checkInput(data) {
 /**
  * Straightforward
  **/
-function checkReason(data) {
-    if (!data.reason) {
-        throw new Meteor.Error('error-invalid-reason', 'Reason not provided', {
-            method: 'reportUserInRoom',
-        });
-    }
-}
-
-/**
- * Straightforward
- **/
-function checkUser(id) {
-    if (!id) {
-        throw new Meteor.Error('error-invalid-user', 'Invalid user', {
-            method: 'reportUserInRoom',
-        });
-    }
-    return id;
-}
-
-/**
- * Straightforward
- **/
 function checkUsersPermissions(id, data) {
     if (!hasPermission(id, 'tandem-report-user', data.rid)) {
         throw new Meteor.Error('error-not-allowed', 'Not allowed', {
@@ -82,11 +61,7 @@ function checkUsersPermissions(id, data) {
  **/
 function checkRoom(data) {
     const room = Rooms.findOneById(data.rid);
-    if (!room) {
-        throw new Meteor.Error('error-invalid-room', 'Invalid room', {
-            method: 'reportUserInRoom',
-        });
-    }
+    checkCondition(room, 'error-invalid-room', 'Invalid room', {method: 'reportUserInRoom'});
 
     if (['c', 'p', 'd'].includes(room.t) === false) {
         throw new Meteor.Error('error-invalid-room-type', `${ room.t } is not a valid room type`, {
@@ -101,11 +76,7 @@ function checkRoom(data) {
  **/
 function checkSubscription(data) {
     const subscription = Subscriptions.findOneByRoomIdAndUsername(data.rid, data.username, {fields: {_id: 1}});
-    if (!subscription) {
-        throw new Meteor.Error('error-user-not-in-room', 'User is not in this room', {
-            method: 'reportUserInRoom',
-        });
-    }
+    checkCondition(subscription, 'error-user-not-in-room', 'User is not in this room', {method: 'reportUserInRoom'});
 }
 
 /**
@@ -124,14 +95,9 @@ function getReportedUser(data, reporterId) {
 /**
  * Straightforward
  **/
-function checkMatch(data, fromUserId) {
+function getMatch(data, fromUserId) {
     const match = TandemUsersMatches.findByUserIdAndRoomId(fromUserId, data.rid);
-
-    if (!match) {
-        throw new Meteor.Error('error-invalid-match', 'Invalid match', {
-            method: 'reportUserInRoom',
-        });
-    }
+    checkCondition(match, 'error-invalid-match', 'Invalid match', {method: 'reportUserInRoom'});
     return match;
 }
 
