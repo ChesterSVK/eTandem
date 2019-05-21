@@ -6,7 +6,15 @@ import TandemUsersMatches from '../models/TandemUsersMatches';
 import {TeachingMotivationEnum, MatchingRequestStateEnum} from "../../lib/helperData";
 import {Users} from 'meteor/rocketchat:models';
 import {getUserPreference} from 'meteor/rocketchat:utils';
+import {getOtherOne} from "../../lib/checkerHelpers";
 
+
+/**
+ * Function formatMatchingResult data was created only to provide properely formatted data on the front-end
+ * so if for some reason UI will change or some additional data is needed this function can be modified or removed totally.
+ * Main motivation for this was to restrict the amount of method calls to server to just only one. Keep that in mind.
+ *
+ */
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////	Methods
 
 Meteor.methods({
@@ -56,7 +64,7 @@ function createMatchmakingData(matchingResult, actualUserId) {
         if (match.usersInMatch.length !== 2) {
             return false;
         }
-        const otherUser = getOtherUserId(match.usersInMatch, actualUserId);
+        const otherUser = getOtherOne(match.usersInMatch, actualUserId);
         if (excludedUsersIds.includes(otherUser)) {
             return false;
         }
@@ -69,20 +77,6 @@ function createMatchmakingData(matchingResult, actualUserId) {
     addFittingLanguageMatches(actualUserId, filteredExcludedMatches, matchingResult);
 }
 
-/**
- * Returns other userId in the array of the userIds
- * @param userIds
- * @param actualUserId
- * @returns {*}
- */
-function getOtherUserId(userIds, actualUserId) {
-    if (userIds[0] === actualUserId) {
-        return userIds[1];
-    }
-    else {
-        return userIds[0];
-    }
-}
 
 /**
  * Formats matches data with initialised attributes
@@ -94,7 +88,7 @@ function getOtherUserId(userIds, actualUserId) {
 function addFittingLanguageMatches(actualUserId, languageMatches, matchingResult) {
 
     matchingResult.matches = languageMatches.map(function (item) {
-        const otherUserId = getOtherUserId(item.usersInMatch, actualUserId);
+        const otherUserId = getOtherOne(item.usersInMatch, actualUserId);
         const topics = getUserPreference(otherUserId, 'userTopics');
         return {
             _id: item._id,

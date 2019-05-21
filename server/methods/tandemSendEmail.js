@@ -5,6 +5,11 @@ import {t} from 'meteor/rocketchat:utils';
 import * as Mailer from 'meteor/rocketchat:mailer';
 import {TandemFeedbackMails} from "../../lib/feedbackMails";
 
+
+/**
+ * So far the html content of the messages is created as an one line string in this file so suggestion is to create
+ * separate html templates which will be used as an email templates in this file filled with valid data.
+ */
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////	Methods
 
 Meteor.methods({

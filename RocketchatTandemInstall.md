@@ -3,6 +3,23 @@
 
 Estimated install time: 60min
 
+Before doing any changes to the code files it is strongly recommended to read [Meteor](https://docs.meteor.com/) documentation thoroughly.
+Also try to create an example application to see the process of adding a code to the files.
+Do not forget that UniTandem code is only a package and not an standalone application so for example testing 
+of the code is different for the package than for the application itself.
+
+Specially learn more about the server and client side differences with imports and exports of the files when creating a new 
+ones, methods, models, helper functions, routes, reactive variables,
+subscribing and un-subscribing to publications and helpful packages. Do not reinvent the wheel. 
+
+Main motivation was to NOT again NOT to create Rocketchat code dependent on this package.
+This package is dependent on RC, but not otherwise. RC developers are quick in responding to bug reports and questions, 
+but do it only if there is no way out of some problem so do not bother them with small details. 
+
+Also remember that newer version of RC might use different packages for the same functions or names of the 
+functions so be careful when integrating this code or using different versions of RC. You will get a lot
+of variable undefined errors so do not worry. 
+ 
 # 1. Download stable version
 
 `$ git clone https://github.com/RocketChat/Rocket.Chat.git`

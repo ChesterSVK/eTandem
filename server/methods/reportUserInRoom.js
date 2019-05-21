@@ -6,6 +6,11 @@ import TandemUsersMatches from '../models/TandemUsersMatches';
 import {TandemFeedbackMails} from "../../lib/feedbackMails";
 import {checkCondition} from "../../lib/checkerHelpers";
 
+
+/**
+ * Method defined for reporting user purposes with sending an email to the responsible persons.
+ */
+
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////	Methods
 
 Meteor.methods({

@@ -9,7 +9,10 @@ import { hasPermission } from 'meteor/rocketchat:authorization';
 import {MatchingRequestStateEnum, TeachingMotivationEnum} from "../../lib/helperData";
 
 
-
+/**
+ * Only functions used in the UniTandem administrations are defined here for providing statistics and helper data for
+ * admins.
+ */
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////	Methods
 
 Meteor.methods({
@@ -137,9 +140,12 @@ function deleteAllUserMatches(){
     TandemUsersMatches.removeAll();
 }
 
+/**
+ * Almost same code as in the Rocketchat code to avoid multiple requests calling to the server.
+ * @param rid room to delete
+ * @returns {*}
+ */
 function eraseRoom(rid) {
-
-
     const room = RocketChat.models.Rooms.findOneById(rid);
 
     if (!room) {

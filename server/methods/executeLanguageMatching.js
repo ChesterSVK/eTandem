@@ -7,6 +7,23 @@ import TandemUsersMatches from '../models/TandemUsersMatches'
 import TandemLanguageMatches from '../models/TandemLanguageMatches'
 import {TeachingMotivationEnum, LanguageLevelsEnum, MatchingRequestStateEnum} from "../../lib/helperData";
 import { negateMotivation } from '../../lib/checkerHelpers'
+
+/**
+ * This file executes the matching algorithm based on language preferences of the user. So far almost no restrictions are
+ * made on the matching algorithm, but later some restriction might be applied to the matching like for example location
+ * or gender of the users so this file might be modified a lot or changed totally according to preferences. Just make sure
+ * the result of the code is tested. This code is not tested so far with the unit test only manual testing was done.
+ *
+ * Base idea of the algorithm is to take all the user language preferences and create language matches in a way that
+ * user1 teaching langs are the same as user2 learning langs and vice versa with user1 learning langs and user2 teaching
+ * langs.
+ *
+ * So far there are a few filters applied like if the users does not have already an ongoing user match,
+ * or if user wants to teach multiple students,
+ * or if the user wants to be excluded from matching,
+ * or if the language levels are right so user with level C1 will not teach someone whi wants to know C2 level of some
+ * language.
+ */
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////	Methods
 
 Meteor.methods({

@@ -8,6 +8,12 @@ import { t } from 'meteor/rocketchat:utils';
 import {MatchingRequestStateEnum} from "../../lib/helperData";
 import {checkCondition, getOtherOne} from "../../lib/checkerHelpers";
 
+
+/**
+ * This file mostly works with already created user's user matches and requests created during creation of the room and user match.
+ * Function "transform" again just formats data for front-end purposes and this file can be changed and modified according
+ * to requirements. Make sure the code works. So far this code was not tested with unit tests only manually.
+ */
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////	Methods
 
 

@@ -12,10 +12,10 @@ import {checkCondition, getOtherOne} from "../../lib/checkerHelpers";
 Meteor.methods({
     unmatchRoom(rid, reason) {
         checkInput(rid, reason);
-        checkUser(Meteor.userId());
-        const match = getMatch(rid, Meteor.userId());
+        checkCondition(Meteor.userId(), 'error-invalid-user', 'Invalid user', {method: 'unmatchRoom'});
+        checkCondition(hasPermission(Meteor.userId(), 'tandem-unmatch'), 'error-not-allowed', 'Not allowed', {method: 'unmatchRoom'});
 
-        //TandemLanguageMatches.hideMatch(match.languageMatch);
+        const match = getMatch(rid, Meteor.userId());
         TandemUsersMatches.unmatchMatch(match._id, true);
 
         sendEmailReport(Meteor.userId(), match, reason);
@@ -36,18 +36,6 @@ function checkInput(rid, reason) {
     check(reason, String);
 }
 
-/**
- * Straightforward
- */
-function checkUser(id) {
-    checkCondition(id, 'error-invalid-user', 'Invalid user', {method: 'unmatchRoom'});
-
-    if (!hasPermission(id, 'tandem-unmatch')) {
-        throw new Meteor.Error('error-not-allowed', 'Not allowed', {
-            method: 'unmatchRoom',
-        });
-    }
-}
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////	Getters
 
@@ -80,9 +68,7 @@ function sendEmailReport(actualUserId, match, reason) {
         reportEmailData,
         (error, result) => {
             if (error) {
-                throw new Meteor.Error('error-sending-email', 'Internal error', {
-                    method: 'unmatchRoom',
-                });
+                checkCondition(error, 'error-sending-email', 'Internal error', {method: 'unmatchRoom'});
             }
         });
 }

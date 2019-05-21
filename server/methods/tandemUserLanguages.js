@@ -29,15 +29,15 @@ Meteor.methods({
 
     /**
      * Sets new user's language preferences
-     * @param lanugagePreferences to set
+     * @param languagePreferences to set
      * @param motivation of the preferences
      * @returns {boolean} if operation was successful
      */
-	'tandemUserLanguages/setPreferences'(lanugagePreferences, motivation) {
+	'tandemUserLanguages/setPreferences'(languagePreferences, motivation) {
 	    checkCondition(this.userId, 'error-invalid-user', 'Invalid user', {method: 'tandemUserLanguages/setPreferences'});
 		checkMotivation(motivation, {method: 'tandemUserLanguages/setPreferences'});
 
-		setLanguagePreference(lanugagePreferences, motivation);
+		setLanguagePreference(languagePreferences, motivation);
 		Meteor.call('executeLanguageMatching',
             Meteor.userId(),
             TandemUserLanguages.findUserLanguages(Meteor.userId(), motivation).fetch());
