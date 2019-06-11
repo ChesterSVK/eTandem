@@ -39,7 +39,7 @@ Skipped
 
 UniTandem MongoDB install and configuration in Linux Ubuntu
 
-1 Install MongoDB by running the following command without the apostrophes: "sudo apt-get install -y mongodb-org
+1 Install MongoDB by running the following command without the quotation marks: "sudo apt-get install -y mongodb-org"
 2 Enable and start MongoDB service: "sudo systemctl enable mongod && sudo systemctl start mongod"
 3 Configure replica set for MongoDB: "echo -e "replication:\n  replSetName: \"rs01\"" | sudo tee -a /etc/mongod.conf"
 4 Restart MongoDB service: "sudo systemctl restart mongod"
